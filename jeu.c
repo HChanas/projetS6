@@ -30,7 +30,7 @@ void affiche_jeu(int* plateau, int pts_j1, int pts_j2){
     affiche_plateau(plateau);
 }
 
-//Affiche les cases du plateau avec le nombre de billes (celui du joueur quoi selon si tu es d'un côté ou de l'autre du plateau faut se représenter mais l'immersion est là on s'y croirait)
+//Affiche les trous du plateau avec le nombre de billes (celui du joueur quoi selon si tu es d'un côté ou de l'autre du plateau faut se représenter mais l'immersion est là on s'y croirait)
 void affiche_plateau(int* plateau){
     int moitie = (T_PLAT/2)-1;
     printf("Joueur 1\n");
@@ -43,7 +43,7 @@ void affiche_plateau(int* plateau){
     printf("Joueur 2\n");
 }
 
-//demande une entrée correspondant à une case et réparti les pierres comme dans les règles du jeu regarde sur la page wikipédia tu crois que je vais détailler les règles ici ?
+//demande une entrée correspondant à une trou et réparti les pierres comme dans les règles du jeu regarde sur la page wikipédia tu crois que je vais détailler les règles ici ?
 void tour_de_jeu(int* plateau, int joueur, int* pts_joueur){
     int* cp = coups_possibles(plateau, joueur);
     for(int i=1, j=joueur==0?0:T_PLAT-1; i<T_PLAT+1; i++, j+=joueur==0?1:-1)
@@ -51,48 +51,73 @@ void tour_de_jeu(int* plateau, int joueur, int* pts_joueur){
             printf(" %d ", i);
         else
             printf("   ");
-    printf("\nTour du joueur %d : Choisis une case maintenant ou conséquences\n", joueur+1);
+    printf("\nTour du joueur %d : Choisis un trou maintenant ou conséquences\n", joueur+1);
     int entree; char *buf = malloc(16);
     scanf("%s", buf); entree = atoi(buf);
-    entree += joueur==1?(2*(T_PLAT/2-entree)):-1;
-    while(!cp[entree]){
-        printf("Case invalide.\n");
+    entree += joueur==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
+    while(trou_valide(cp, entree)){
+        printf("Trou invalide.\n");
         scanf("%s", buf); entree = atoi(buf);
         entree += joueur==1?(2*(T_PLAT/2-entree)):-1;
     }
-    //numéro de case demandé : 1 - 6
-    //camp du joueur 1 (0) : cases 0 - 5
-    //camp du joueur 2 (1) : cases 11 - 6 (besoin de convertir)
+    //numéro de trou demandé : 1 - 6
+    //camp du joueur 1 (0) : trous 0 - 5
+    //camp du joueur 2 (1) : trous 11 - 6 (besoin de convertir)
 
-    int nb_pierres = plateau[entree];
-    plateau[entree] = 0;
     //Répartition du tas en sens horaire
-    while(nb_pierres>0){
-        entree++;
-        if(entree==T_PLAT)
-            entree=0;
-        plateau[entree]++;
-        nb_pierres--;
-    }
+    repartition(plateau, &entree);
     //Tas de billes mangés
-    while((plateau[entree]==2)||(plateau[entree]==3)){
-        *pts_joueur += plateau[entree];
-        plateau[entree] = 0;
-        entree--;
-        if(entree<0)
-            entree = T_PLAT-1;
-    }
+    captures(plateau, &entree, pts_joueur, joueur);
+}
+
+//renvoie 1 si l'entree n'est pas un coup que peut jouer le joueur (en fonction de cp)
+int trou_valide(int* cp, int entree){
+    if((entree<0)||(entree>=T_PLAT))
+        return 1;
+    return !cp[entree];
 }
 
 //calcule les coups possibles pour le tour d'un joueur
-//se contente de regarder les cases vides pour le moment
+//se contente de regarder les trous vides pour le moment
 int* coups_possibles(int* plateau, int joueur){
-    int* cp = malloc(sizeof(int)*T_PLAT);
+    int* cp = malloc(sizeof(int)*T_PLAT); //tableau de coups possibles
     for(int i=0; i<T_PLAT; i++)
         cp[i]=0;
     int max = joueur==0?T_PLAT/2:T_PLAT;
-    for(int i = joueur==0?0:T_PLAT/2; i<max; i++)
+    for(int i = joueur==0?0:T_PLAT/2; i<max; i++) //vérifie les trous du bon côté où il y a des billes
         if(plateau[i]!=0)
             cp[i] = 1;
     return cp;
+}
+
+void repartition(int* plateau, int* trou){
+    int nb_pierres = plateau[*trou];
+    plateau[*trou] = 0;
+    while(nb_pierres>0){
+        (*trou)++;
+        if(*trou==T_PLAT)
+            *trou=0;
+        plateau[*trou]++;
+        nb_pierres--;
+    }
+}
+
+void captures(int* plateau, int* trou, int* pts_joueur, int joueur){
+    //tant que le trou a 2 ou 3 billes et est dans le camp adverse on prend
+    while(((plateau[*trou]==2)||(plateau[*trou]==3))&&(joueur!=camp(*trou))){
+        *pts_joueur += plateau[*trou];
+        plateau[*trou] = 0;
+        (*trou)--;
+        if(*trou<0)
+            *trou = T_PLAT-1;
+    }
+}
+
+//dans quel camp est le trou (1 ou 2) 0 => erreur
+int camp(int trou){
+    if((trou>=0)&&(trou<T_PLAT/2))
+        return 0;
+    if((trou>=T_PLAT/2)&&(trou<T_PLAT))
+        return 1;
+    return -1;
 }
