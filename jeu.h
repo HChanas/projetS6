@@ -16,6 +16,9 @@ int* coups_possibles(int* plateau, int joueur);
 /* Réparti les billes du tas choisi dans les tas suivants selon le
  * principe de l'awalé. */
 void repartition(int* plateau, int* trou);
+/* Vérifie si le coup 'affame' l'adversaire, ce qui signifie qu'on capture
+ * toutes les graines du camp adverse. */
+int affame(int* plateau, int trou);
 /* Vérifie les tas capturés selon les règles et calcule les points gagnés. */
 void captures(int* plateau, int* trou, int* pts_joueur, int joueur);
 /* Dans quel camp est le trou (0 ou 1) -1 => trou invalide. */

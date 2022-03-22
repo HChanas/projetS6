@@ -91,19 +91,38 @@ int* coups_possibles(int* plateau, int joueur){
 }
 
 void repartition(int* plateau, int* trou){
+    int depart = *trou;
     int nb_pierres = plateau[*trou];
     plateau[*trou] = 0;
     while(nb_pierres>0){
         (*trou)++;
         if(*trou==T_PLAT)
             *trou=0;
-        plateau[*trou]++;
-        nb_pierres--;
+        if(*trou != depart){ //on ne met pas de graine dans le trou que l'on a joué
+            plateau[*trou]++;
+            nb_pierres--;
+        }
     }
+}
+
+//le coup permet-il de manger toutes les graines adverses ? (si oui aucune capture n'est effectuée)
+int affame(int* plateau, int trou){
+    int min = trou>5?6:0, i;
+    for(i=min+(T_PLAT/2)-1; i>trou; i--)
+        if(plateau[i]!=0)
+            return 0; //une case avec des graines qui ne sera pas capturé
+
+    for(; i>=min; i--)
+        if((plateau[i]!=2)&&(plateau[i]!=3))
+            return 0; //si il y a des cases dont les graines ne seront pas capturées
+    return 1;
 }
 
 void captures(int* plateau, int* trou, int* pts_joueur, int joueur){
     //tant que le trou a 2 ou 3 billes et est dans le camp adverse on prend
+    if(affame(plateau, *trou))//règle du jeu qui dit qu'on ne capture pas si
+    //le coup permet de capturer toutes les graines du camp adverse (affamer)
+        return;
     while(((plateau[*trou]==2)||(plateau[*trou]==3))&&(joueur!=camp(*trou))){
         *pts_joueur += plateau[*trou];
         plateau[*trou] = 0;
