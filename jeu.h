@@ -23,3 +23,11 @@ int affame(int* plateau, int trou);
 void captures(int* plateau, int* trou, int* pts_joueur, int joueur);
 /* Dans quel camp est le trou (0 ou 1) -1 => trou invalide. */
 int camp(int trou);
+/* Vérifie si il y a au moins une bille dans le camp du joueur donné (renvoie 0, 1 sinon). */
+int est_affame(int* plateau, int joueur);
+/* Une règle stipule que si le joueur adverse est affamé (plus de graine dans son camp),
+ * alors le joueur doit obligatoirement le nourrir (jouer un coup qui remet des graines).
+ * Si le joueur ne peut nourrir son adversaire, alors il capture toutes les graines restantes et gagne.
+ * 
+ * Donne l'ensemble des coups possibles qui nourrissent l'adversaire parmi les coups possibles déjà calculés. */
+void coups_nourrissants(int* plateau, int joueur, int* coups_possibles);

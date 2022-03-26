@@ -87,6 +87,8 @@ int* coups_possibles(int* plateau, int joueur){
     for(int i = joueur==0?0:T_PLAT/2; i<max; i++) //vérifie les trous du bon côté où il y a des billes
         if(plateau[i]!=0)
             cp[i] = 1;
+    if(est_affame(plateau, 1-joueur))
+        coups_nourrissants(plateau, joueur, cp);
     return cp;
 }
 
@@ -139,4 +141,21 @@ int camp(int trou){
     if((trou>=T_PLAT/2)&&(trou<T_PLAT))
         return 1;
     return -1;
+}
+
+int est_affame(int* plateau, int joueur){
+    int max = joueur==0?T_PLAT/2:T_PLAT;
+    for(int i=0+(T_PLAT*joueur/2); i<max; i++)
+        if(plateau[i]!=0)
+            return 0;
+    return 1;
+}
+//utile si l'adversaire est affamé, pour ajuster les coups possibles
+void coups_nourrissants(int* plateau, int joueur, int* coups_possibles){
+    int max = joueur==0?T_PLAT/2:T_PLAT;
+    for(int i = joueur==0?0:T_PLAT/2; i<max; i++)
+        if(coups_possibles[i]!=0){ //coup possible
+            if(plateau[i]<max-i) //si il n'y a pas assez de graines pour nourrir l'adversaire
+                coups_possibles[i] = 0;
+        }
 }
