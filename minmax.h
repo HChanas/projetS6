@@ -1,4 +1,6 @@
-#define NB_FILS_MAX 6
+#include "jeu.h"
+
+#define NB_FILS_MAX T_PLAT/2
 
 #define MIN(x, y) ((x)>(y)?(y):(x))
 #define MAX(x, y) (-MIN(-(x),-(y)))
@@ -8,6 +10,7 @@ typedef struct noeud_t{
     //A la i-ème case du tableau, se trouve l'adresse du noeud correspondant au coup i(+1). e.g. fils[1] -> trou 2 (ou 8 si joueur 2).
     //Si par exemple le trou 4 (ou 10 donc) ne peut être joué, fils[3] = NULL.
     int valeur; //Si le noeud est une feille ou si la valeur de ses fils a été évaluée. Valeur donnée initialement aux feuilles par la fonction d'évaluation.
+    int feuille; //Indique si le noeud est une feuille pour simplifier des trucs
 } Noeud;
 
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
@@ -16,7 +19,7 @@ typedef struct noeud_t{
 void init_noeud(Noeud* n);
 
 /* Crée un nouveau noeud (initialisé) et met son adresse dans la case du tableau fils donnée. L'adresse du nouveau noeud est renvoyée. */
-Noeud* nouveau_fils(Noeud* n, int case);
+Noeud* nouveau_fils(Noeud* n, int indice);
 
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
 void free_arbre(Noeud* racine);
