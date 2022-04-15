@@ -60,8 +60,11 @@ int evaluation(Situation s, int joueur_a_maximiser);
 /*--- EVALUATION DE L'ARBRE ---*/
 
 /* En fonction de la valeur des feuilles données par la fonction d'évaluation,
- * calcule la valeur de tous les noeuds.*/
-void eval_arbre(Noeud* racine);
+ * calcule la valeur de tous les noeuds. coup permet de récupérer le coup à jouer.
+ * joueur_a_maximiser est à 1 de base, car la racine est un noeud qui correspond
+ * au joueur que l'on cherche à maximiser. A chaque appel récursif joueur_a_maximier
+ * varie entre 0 et 1. */
+void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup);
 
 
 /// S'AFFRANCHIR DE L'ARBRE
