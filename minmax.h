@@ -33,7 +33,7 @@ void free_arbre(Noeud* racine);
 
 /*--- STRUCTURE SITUATION ---*/
 
-/* Crée et initialise une situation en fonction des arguments donnés. */
+/* Initialise une situation en fonction des arguments donnés. */
 Situation nouvelle_situation(int* plateau, int joueur, int pts_j1, int pts_j2);
 
 /* Copie d'une situation (notamment le plateau). Plateau à free ! */
