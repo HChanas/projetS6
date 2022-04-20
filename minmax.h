@@ -5,13 +5,18 @@
 #define MIN(x, y) ((x)>(y)?(y):(x))
 #define MAX(x, y) (-MIN(-(x),-(y)))
 
-typedef struct noeud_t{
-    noeud_t* fils[NB_FILS_MAX]; //Tableau de pointeurs vers les fils. Il peut y avoir des NULL, si certains coups étaient impossibles.
+typedef struct Noeud Noeud;
+struct Noeud {
+    Noeud* fils[NB_FILS_MAX]; //Tableau de pointeurs vers les fils. Il peut y avoir des NULL, si certains coups étaient impossibles.
     //A la i-ème case du tableau, se trouve l'adresse du noeud correspondant au coup i(+1). e.g. fils[1] -> trou 2 (ou 8 si joueur 2).
     //Si par exemple le trou 4 (ou 10 donc) ne peut être joué, fils[3] = NULL.
-    int valeur; //Si le noeud est une feille ou si la valeur de ses fils a été évaluée. Valeur donnée initialement aux feuilles par la fonction d'évaluation.
-    int feuille; //Indique si le noeud est une feuille pour simplifier des trucs
-} Noeud;
+    int valeur;  // Si le noeud est une feille ou si la valeur de ses fils a été
+               // évaluée. Valeur donnée initialement aux feuilles par la
+               // fonction d'évaluation.
+     int feuille; // Indique si le noeud est une feuille pour simplifier des trucs
+    int coups;
+    int numero_joeur;
+};
 
 typedef struct situation_t{ //enregistre l'état d'une partie
     int* plateau;       //le plateau
