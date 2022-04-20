@@ -35,7 +35,19 @@ void init_noeud(Noeud *nouveau) {
  * fils donnée. L'adresse du nouveau noeud est renvoyée. */
 Noeud *nouveau_fils(Noeud *n, int indice) {
   Noeud *nouveau = malloc(sizeof(*nouveau));
-  init_noeud(nouveau);
+  if (nouveau)
+    init_noeud(nouveau);
+  else
+    fprintf(stderr, "Memory Allocation Failed");
   n->fils[indice] = nouveau;
   return nouveau;
+}
+
+/* Libère récursivement tout l'espace mémoire d'un arbre. */
+void free_arbre(Noeud *racine) {
+  if (racine == NULL)
+    return;
+  for (int i = 0; i < NB_FILS_MAX; i++)
+    free_arbre(racine->fils[i]);
+  free(racine);
 }
