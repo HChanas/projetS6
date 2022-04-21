@@ -1,10 +1,8 @@
+#include "minmax.h"
 #include "jeu.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define NB_FILS_MAX T_PLAT / 2
-
-#include "minimax.h"
 
 /* Initialise une situation en fonction des arguments donnés. */
 Situation nouvelle_situation(int *plateau, int joueur, int pts_j1, int pts_j2) {
@@ -16,22 +14,6 @@ Situation nouvelle_situation(int *plateau, int joueur, int pts_j1, int pts_j2) {
 int evaluation(Situation s, int joueur) {
   return joueur == 0 ? s.pts_j1 - s.pts_j2 : s.pts_j2 - s.pts_j1;
 }
-
-typedef struct Noeud Noeud;
-struct Noeud {
-  int valeur;  // Si le noeud est une feille ou si la valeur de ses fils a été
-               // évaluée. Valeur donnée initialement aux feuilles par la
-               // fonction d'évaluation.
-  int feuille; // Indique si le noeud est une feuille pour simplifier des trucs
-  int coups;
-  int numero_joeur;
-  Noeud *fils[NB_FILS_MAX];
-  // Tableau de pointeurs vers les fils. Il peut y avoir
-  // des NULL, si certains coups étaient impossibles.
-  // A la i-ème case du tableau, se trouve l'adresse du noeud correspondant au
-  // coup i(+1). e.g. fils[1] -> trou 2 (ou 8 si joueur 2). Si par exemple le
-  // trou 4 (ou 10 donc) ne peut être joué, fils[3] = NULL.
-};
 
 /* Initialise les champs du noeud (fils à NULL et valeur à 0 par défaut). */
 void init_noeud(Noeud *nouveau) {
@@ -79,10 +61,16 @@ Noeud *nouvel_arbre(Situation s, int joueur_a_maximiser, int profondeur) {
     racine->valeur = evaluation(s, joueur_a_maximiser);
     return racine;
   }
-  int *cp = coups_possibles(Situation->plateau, joueur_a_maximiser);
-  for (int i = 0; 12; i++) {
+  int *cp = coups_possibles(s.plateau, joueur_a_maximiser);
+  for (int i = 0; i < 12; i++) {
     // Regarder si case a 1 taille 12
     if (cp[i]) {
+
+      if (i < 6 && joueur_a_maximiser == 0) {
+        nouveau_fils(racine, i);
+      } else {
+        nouveau_fils(racine, i);
+      }
     }
   }
   return racine;
