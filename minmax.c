@@ -17,7 +17,6 @@ int evaluation(Situation s, int joueur) {
 
 /* Initialise les champs du noeud (fils à NULL et valeur à 0 par défaut). */
 void init_noeud(Noeud *nouveau) {
-
   nouveau->valeur = 0;
   nouveau->feuille = 0;
   nouveau->coups = 0;
