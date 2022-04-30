@@ -8,28 +8,39 @@
  * Cela permet de faciliter la répartition des tas en sens horaire. 
  */
 
-
-int main(int argc, char** argv){
-    int plateau[T_PLAT] = {INIT_TAB}, pts_j[2]={0,0}, j=0, un=1;
-    while(un){
+/* Lance une partie entre deux joueurs humains (local). */
+void partie_pvp(){
+    int plateau[T_PLAT] = {INIT_TAB};
+    int  pts_j[2]={0,0}, j=0;
+    while(1){
         affiche_jeu(plateau, pts_j[0], pts_j[1]);
         tour_de_jeu(plateau, j, &pts_j[j]);
         j = 1-j; // 0 <-> 1
-        for(int i=0; i<2; i++){
-            if(pts_j[i]>=25){
-                printf("Victoire joueur %d\n", i+1);
-                un=0;
-            }
+        switch(verif_fin((Situation) {plateau, pts_j[0], pts_j[1], j})){
+            case 1: printf("Victoire joueur 1\n"); return;
+            case 2: printf("Victoire joueur 2\n"); return;
+            case 3: printf("Egalite\n"); return;
+            default: break;
         }
     }
+}
+
+/* Vérifie si la partie est finie.
+ * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné ; 3 -> égalité. */
+int verif_fin(Situation s){
+    if(s.pts_j1>=25) return 1;
+    if(s.pts_j2>=25) return 2;
+    if(verif_partie_infinie(s)) return 3;
     return 0;
 }
 
+/* Affiche le plateau et le score des joueurs. */
 void affiche_jeu(int* plateau, int pts_j1, int pts_j2){
     printf("points: Joueur 1 : %d, Joueur 2 : %d\n", pts_j1, pts_j2);
     affiche_plateau(plateau);
 }
 
+/* Affiche les trous du plateau de jeu. */
 //Affiche les trous du plateau avec le nombre de billes (celui du joueur quoi selon si tu es d'un côté ou de l'autre du plateau faut se représenter mais l'immersion est là on s'y croirait)
 void affiche_plateau(int* plateau){
     int moitie = (T_PLAT/2)-1;
@@ -43,6 +54,8 @@ void affiche_plateau(int* plateau){
     printf("Joueur 2\n");
 }
 
+/* Demande une trou au joueur, effectue la répartition du tas choisi, 
+ * gère le mangeage de billes si besoin et calcule les points. */
 //demande une entrée correspondant à une trou et réparti les pierres comme dans les règles du jeu regarde sur la page wikipédia tu crois que je vais détailler les règles ici ?
 void tour_de_jeu(int* plateau, int joueur, int* pts_joueur){
     int* cp = coups_possibles(plateau, joueur);
@@ -70,6 +83,7 @@ void tour_de_jeu(int* plateau, int joueur, int* pts_joueur){
     captures(plateau, &entree, pts_joueur, joueur);
 }
 
+/* Vérifie en fonction du tableau de coups possibles si l'entrée en est. */
 //renvoie 1 si l'entree n'est pas un coup que peut jouer le joueur (en fonction de cp)
 int trou_valide(int* cp, int entree){
     if((entree<0)||(entree>=T_PLAT))
@@ -77,8 +91,8 @@ int trou_valide(int* cp, int entree){
     return !cp[entree];
 }
 
-//calcule les coups possibles pour le tour d'un joueur
-//se contente de regarder les trous vides pour le moment
+/* Calcule les coups possibles pour le tour d'un joueur et renvoie
+ * un tableau de la taille du plateau avec les trous possibles à 1. */
 int* coups_possibles(int* plateau, int joueur){
     int* cp = malloc(sizeof(int)*T_PLAT); //tableau de coups possibles
     for(int i=0; i<T_PLAT; i++)
@@ -92,6 +106,8 @@ int* coups_possibles(int* plateau, int joueur){
     return cp;
 }
 
+/* Réparti les billes du tas choisi dans les tas suivants selon le
+ * principe de l'awalé. */
 void repartition(int* plateau, int* trou){
     int depart = *trou;
     int nb_pierres = plateau[*trou];
@@ -107,6 +123,8 @@ void repartition(int* plateau, int* trou){
     }
 }
 
+/* Vérifie si le coup 'affame' l'adversaire, ce qui signifie qu'on capture
+ * toutes les graines du camp adverse. */
 //le coup permet-il de manger toutes les graines adverses ? (si oui aucune capture n'est effectuée)
 int affame(int* plateau, int trou){
     int min = trou>5?6:0, i;
@@ -120,6 +138,7 @@ int affame(int* plateau, int trou){
     return 1;
 }
 
+/* Vérifie les tas capturés selon les règles et calcule les points gagnés. */
 void captures(int* plateau, int* trou, int* pts_joueur, int joueur){
     //tant que le trou a 2 ou 3 billes et est dans le camp adverse on prend
     if(affame(plateau, *trou))//règle du jeu qui dit qu'on ne capture pas si
@@ -134,7 +153,7 @@ void captures(int* plateau, int* trou, int* pts_joueur, int joueur){
     }
 }
 
-//dans quel camp est le trou (1 ou 2) 0 => erreur
+/* Dans quel camp est le trou (0 ou 1) -1 => trou invalide. */
 int camp(int trou){
     if((trou>=0)&&(trou<T_PLAT/2))
         return 0;
@@ -143,6 +162,7 @@ int camp(int trou){
     return -1;
 }
 
+/* Vérifie si il y a au moins une bille dans le camp du joueur donné (renvoie 0, 1 sinon). */
 int est_affame(int* plateau, int joueur){
     int max = joueur==0?T_PLAT/2:T_PLAT;
     for(int i=0+(T_PLAT*joueur/2); i<max; i++)
@@ -150,7 +170,11 @@ int est_affame(int* plateau, int joueur){
             return 0;
     return 1;
 }
-//utile si l'adversaire est affamé, pour ajuster les coups possibles
+/* Une règle stipule que si le joueur adverse est affamé (plus de graine dans son camp),
+ * alors le joueur doit obligatoirement le nourrir (jouer un coup qui remet des graines).
+ * Si le joueur ne peut nourrir son adversaire, alors il capture toutes les graines restantes et gagne.
+ * 
+ * Donne l'ensemble des coups possibles qui nourrissent l'adversaire parmi les coups possibles déjà calculés. */
 void coups_nourrissants(int* plateau, int joueur, int* coups_possibles){
     int max = joueur==0?T_PLAT/2:T_PLAT;
     for(int i = joueur==0?0:T_PLAT/2; i<max; i++)
@@ -158,4 +182,15 @@ void coups_nourrissants(int* plateau, int joueur, int* coups_possibles){
             if(plateau[i]<max-i) //si il n'y a pas assez de graines pour nourrir l'adversaire
                 coups_possibles[i] = 0;
         }
+}
+
+/* Tentative de détection des situations où le jeu dure indéfiniement...
+ * Pour le moment se contente (en gros) de vérifier si il reste plus que 2 graines dans le jeu.
+ * Peut-être que c'est suffisant mais jsp ^^ xD
+ * renvoie 1 si la partie va durer à l'infini. */
+int verif_partie_infinie(Situation s){
+    if((s.pts_j1+s.pts_j2)<46) return 0; //au moins trois graines
+    if(((s.plateau[0])&&(s.plateau[11])&&(s.joueur_tour))||((s.plateau[5])&&(s.plateau[6])&&(!s.joueur_tour))) return 0; 
+    //cas particulier avec 2 graines mais où un joueur gagne au prochain coup
+    return 1;
 }
