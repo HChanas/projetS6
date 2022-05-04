@@ -20,13 +20,6 @@ typedef struct noeud_t{
     int numero_joeur;
 } Noeud;
 
-typedef struct situation_t{ //enregistre l'état d'une partie
-    int* plateau;       //le plateau
-    int pts_j1;         //points du joueur 1
-    int pts_j2;         //joueur 2
-    int joueur_tour;    //le joueur à qui c'est le tour de jouer et tout bref
-} Situation;
-
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
 
 /* Initialise les champs du noeud (fils à NULL et valeur à 0 par défaut). */
@@ -39,9 +32,6 @@ Noeud* nouveau_fils(Noeud* n, int indice);
 void free_arbre(Noeud* racine);
 
 /*--- STRUCTURE SITUATION ---*/
-
-/* Initialise une situation en fonction des arguments donnés. */
-Situation nouvelle_situation(int* plateau, int joueur, int pts_j1, int pts_j2);
 
 /* Copie d'une situation (notamment le plateau). Plateau à free ! */
 Situation copie_situation(Situation s);
@@ -80,7 +70,25 @@ int minmax_leger(Situation s, int profondeur, int joueur_a_maximiser, int *coup)
 
 /// ELAGAGE ALPHA-BETA
 
-/* Minmax en appliquant la logique de l'élagage alpha-beta. */
-void minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int *alpha, int *beta);
+/* Minmax en appliquant la logique de l'élagage alpha-beta. La fonction d'évaluation à utiliser est donnée. */
+void minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int *alpha, int *beta, int (*eval)(Situation s, int joueur_a_maximiser));
+
+/// COMPARER LES FONCTIONS D'EVALUATION
+
+/* Données issues d'un duel acharné entre deux IA ayant des différences subtiles...
+ * Le joueur 1 est toujours celui qui commence à jouer. */
+typedef struct donnees_t{
+    float taux_v1;  //pourcentage de victoire du joueur 1
+    float taux_v2;  //pourcentage de victoire du joueur 2
+    float moy_pts_j1;   //moyenne des points du joueur 1 à la fin de la partie
+    float moy_pts_j2;   //moyenne des points du j2
+} Donnees;
+
+/* Fonction qui joue n coups de façon aléatoire sur une partie. srand à initialiser. */
+void coups_aleatoires(Situation *s, int n);
+
+/* Fonction qui lance k parties entre deux IA, utilisant les fonctions d'évalutations ainsi que les profondeurs données.
+ * Les k/6 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée. */
+Donnees affrontements_successifs(int k, int profondeurs[2], int (*eval[2])(Situation s, int joueur_a_maximiser));
 
 #endif

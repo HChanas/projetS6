@@ -1,5 +1,7 @@
-run: cmpl
-	./awale
+SRC=jeu.c minmax.c main.c
 
-cmpl: jeu.c main.c jeu.h
-	gcc -o awale -Wall main.c jeu.c
+run: awale
+	./$^
+
+awale: ${SRC} jeu.h
+	gcc -o $@ -Wall ${SRC}
