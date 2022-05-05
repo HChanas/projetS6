@@ -4,4 +4,4 @@ run: awale
 	./$^
 
 awale: ${SRC} jeu.h
-	gcc -o $@ -Wall ${SRC}
+	gcc -Wall -o $@ ${SRC}

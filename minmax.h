@@ -88,7 +88,8 @@ typedef struct donnees_t{
 void coups_aleatoires(Situation *s, int n);
 
 /* Fonction qui lance k parties entre deux IA, utilisant les fonctions d'évalutations ainsi que les profondeurs données.
- * Les k/6 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée. */
-Donnees affrontements_successifs(int k, int profondeurs[2], int (*eval[2])(Situation s, int joueur_a_maximiser));
+ * Les k/6 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée.
+ * Le troisième argument prend un tableau de pointeurs de fonctions de taille 2 (donc les deux fonctions d'évalutations)*/
+Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situation s, int joueur_a_maximiser));
 
 #endif

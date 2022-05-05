@@ -98,10 +98,11 @@ void coups_aleatoires(Situation *s, int n){
 }
 
 /* Fonction qui lance k parties entre deux IA, utilisant les fonctions d'évalutations ainsi que les profondeurs données.
- * Les k/6 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée. */
+ * Les k/6 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée.
+ * Le troisième argument prend un tableau de pointeurs de fonctions de taille 2 (donc les deux fonctions d'évalutations)*/
 
 /* VERSION 'ALÉATOIRE' EN ATTENDANT QUE MINMAX ALPHA-BETA SOIR IMPLEMENTÉE */
-Donnees affrontements_successifs(int k, int profondeurs[2], int (*eval[2])(Situation s, int joueur_a_maximiser)){
+Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situation s, int joueur_a_maximiser)){
     int nb_coups_alea = k/6, res, /*alpha, beta, coup,*/ nb_v_j1=0, nb_v_j2=0, tt_pts_j1=0, tt_pts_j2=0;
     for(int i=0; i<k; i++){     //k parties
         int plateau[T_PLAT] = {INIT_TAB};
