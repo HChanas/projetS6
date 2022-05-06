@@ -38,8 +38,7 @@ Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
   } else {
     int *cp = coups_possibles(s);
     for (int i = 0; i < NB_FILS_MAX; i++) {
-
-      noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, cp[i]);
+      noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, cp[i + (numero_joeur*6)]);
     }
   }
   return noeud;
