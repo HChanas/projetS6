@@ -48,17 +48,14 @@ Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur, int coup);
 /*--- FONCTION D'EVALUATION ---*/
 
 /* Fonction simple qui renvoie une valeur en fonction des points des joueurs.
- * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non.
- * Peut être : return joueur_a_maximiser==0 ? pts_j1-pts_j2 : pts_2-pts_j1 tout simplement (version simple) */
+ * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non. */
 int evaluation(Situation s, int joueur_a_maximiser);
 
 /*--- EVALUATION DE L'ARBRE ---*/
 
 /* En fonction de la valeur des feuilles données par la fonction d'évaluation,
  * calcule la valeur de tous les noeuds. coup permet de récupérer le coup à jouer.
- * joueur_a_maximiser est à 1 de base, car la racine est un noeud qui correspond
- * au joueur que l'on cherche à maximiser. A chaque appel récursif joueur_a_maximier
- * varie entre 0 et 1. */
+ * joueur_a_maximiser correspond au joueur que l'on cherche à maximiser, i.e. celui qu'on cherche à faire gagner. */
 void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup);
 
 /// S'AFFRANCHIR DE L'ARBRE
