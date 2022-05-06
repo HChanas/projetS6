@@ -7,7 +7,7 @@
 int main() {
   int plateau[T_PLAT] = {INIT_TAB};
   Situation initiale = {plateau, 0, 0, 0};
-  Noeud *racine = nouvelle_arbre(3, 1, initiale, 0, 1);
+  Noeud *racine = nouvel_arbre(initiale, 0, 4,0);
   print_tree(racine, 3);
   free_arbre(racine);
   return 0;

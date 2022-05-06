@@ -4,6 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Copie d'une situation (notamment le plateau). Plateau à free ! */
+Situation copie_situation(Situation s){
+    int* np = malloc(T_PLAT*sizeof(int));
+    for(int i=0; i<T_PLAT; i++)
+        np[i] = s.plateau[i];
+    return (Situation) {np, s.pts_j1, s.pts_j2, s.joueur_tour};
+}
+
 void calcul_coup(Situation *s, int coup) {
   // Répartition du tas en sens horaire
   repartition(*s, &coup);
@@ -17,7 +25,7 @@ int evaluation(Situation s, int joueur) {
 }
 
 // N ary binary tree of n depths
-Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
+/*Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
                       int possible) {
   Noeud *noeud = malloc(sizeof(Noeud));
   noeud->numero_joeur = numero_joeur;
@@ -36,14 +44,42 @@ Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
   if (depth == 0) {
     noeud->feuille = 1;
   } else {
+    s.joueur_tour = 1 - s.joueur_tour;
     int *cp = coups_possibles(s);
     for (int i = 0; i < NB_FILS_MAX; i++) {
-      s.joueur_tour = 1 - s.joueur_tour;
-      noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i,
-                                      cp[i + (numero_joeur * 6)]);
+      Situation copie = copie_situation(s);
+      noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, copie, i, cp[i + (numero_joeur * 6)]);
+      free(copie.plateau);
     }
+    free(cp);
   }
   return noeud;
+}*/
+
+Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur,int coup){
+    Noeud* racine = malloc(sizeof(Noeud));
+    for (int i = 0; i < NB_FILS_MAX; i++)
+        racine->fils[i] = NULL;
+    racine->feuille=0;
+    racine->valeur=696969;
+    racine->coups=coup;
+    if(profondeur==0){
+        racine->feuille = 1;
+        racine->valeur = evaluation(s, joueur_a_max);
+        return racine;
+    }
+    int* c_possibles = coups_possibles(s);
+    for(int i=0; i<T_PLAT; i++){
+        if(c_possibles[i]){
+            Situation s2 = copie_situation(s);
+            calcul_coup(&s2, i);
+            s2.joueur_tour = 1 - s2.joueur_tour;
+            racine->fils[i-s.joueur_tour*6] = nouvel_arbre(s2, joueur_a_max, profondeur-1,i);
+            free(s2.plateau);
+        }
+    }
+    free(c_possibles);
+    return racine;
 }
 
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
@@ -61,7 +97,7 @@ void print_tree(Noeud *racine, int depth) {
     return;
   for (int i = 0; i < depth; i++)
     printf("\t");
-  printf("%d\n", racine->valeur);
+  printf("(%d) %d\n", racine->coups+1,racine->valeur);
   for (int i = 0; i < NB_FILS_MAX; i++)
     print_tree(racine->fils[i], depth + 1);
 }
