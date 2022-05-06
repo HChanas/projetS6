@@ -4,4 +4,4 @@ run: awale
 	./$^
 
 awale: ${SRC} jeu.h
-	gcc -Wall -o $@ ${SRC}
+	gcc -Wall -Werror -fsanitize=address -o $@ ${SRC}
