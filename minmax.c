@@ -135,12 +135,12 @@ void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
         // parcourrir les fils et prendre le minimum 
         buff = 999999999; //init le buff a une grande valeur   pour prendre même la premier valeur minimum  
         while (i < racine->feuille) {
-            if (racine->fils[i] < buff ) {
-                buff = racine->fils[i]; 
+            if (racine->fils[i]->valeur < buff ) {
+                buff = racine->fils[i]->valeur; 
             }
             i++; 
         }
-        coup = buff; // si j'ai bien compris comment a quio sert la variable coup  
+        coup = &buff; // si j'ai bien compris comment a quio sert la variable coup  
     }
     // cas ou le neud ne correspond pas au joeur a maximiser : 
     else {
@@ -148,12 +148,12 @@ void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
         buff = -1; // contraire a l'autre fonctionnement du min 
         // même chose pour la boucle 
         while (i < racine->feuille) {
-            if (racine->fils[i] > buff ) {
-                buff = racine->fils[i]; 
+            if (racine->fils[i]->valeur  > buff ) {
+                buff = racine->fils[i]->valeur; 
             }
             i++; 
         }
-        coup = buff // A VERIFIER 
+        coup = &buff; // si j'ai bien compris comment a quio sert la variable coup  
     }
     
 }
