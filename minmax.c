@@ -24,38 +24,8 @@ int evaluation(Situation s, int joueur) {
   return joueur == 0 ? s.pts_j1 - s.pts_j2 : s.pts_j2 - s.pts_j1;
 }
 
-// N ary binary tree of n depths
-/*Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
-                      int possible) {
-  Noeud *noeud = malloc(sizeof(Noeud));
-  noeud->numero_joeur = numero_joeur;
-  noeud->coups = coups;
-  noeud->possible = possible;
-  noeud->feuille = 0;
-  if (possible) {
-    calcul_coup(&s, coups);
-    noeud->valeur = evaluation(s, numero_joeur);
-  } else {
-    noeud->valeur = 0;
-  }
-  for (int i = 0; i < 6; i++) {
-    noeud->fils[i] = NULL;
-  }
-  if (depth == 0) {
-    noeud->feuille = 1;
-  } else {
-    s.joueur_tour = 1 - s.joueur_tour;
-    int *cp = coups_possibles(s);
-    for (int i = 0; i < NB_FILS_MAX; i++) {
-      Situation copie = copie_situation(s);
-      noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, copie, i, cp[i + (numero_joeur * 6)]);
-      free(copie.plateau);
-    }
-    free(cp);
-  }
-  return noeud;
-}*/
-
+/* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
+ * La profondeur de l'arbre est précisée. */
 Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur,int coup){
     Noeud* racine = malloc(sizeof(Noeud));
     for (int i = 0; i < NB_FILS_MAX; i++)

@@ -43,9 +43,6 @@ void calcul_coup(Situation* s, int coup_joue);
 
 /* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
  * La profondeur de l'arbre est précisée. */
-//Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
-//                      int possible);
-
 Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur, int coup);
 
 /*--- FONCTION D'EVALUATION ---*/
