@@ -18,18 +18,16 @@ typedef struct noeud_t{
     int feuille; // Indique si le noeud est une feuille pour simplifier des trucs
     int coups;
     int numero_joeur;
+    int possible;
 } Noeud;
 
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
 
-/* Initialise les champs du noeud (fils à NULL et valeur à 0 par défaut). */
-void init_noeud(Noeud* n);
-
-/* Crée un nouveau noeud (initialisé) et met son adresse dans la case du tableau fils donnée. L'adresse du nouveau noeud est renvoyée. */
-Noeud* nouveau_fils(Noeud* n, int indice);
-
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
 void free_arbre(Noeud* racine);
+
+/* affiche l'abre */
+void print_tree(Noeud *racine, int depth);
 
 /*--- STRUCTURE SITUATION ---*/
 
@@ -45,7 +43,8 @@ void calcul_coup(Situation* s, int coup_joue);
 
 /* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
  * La profondeur de l'arbre est précisée. */
-Noeud* nouvel_arbre(Situation s, int joueur_a_maximiser, int profondeur);
+Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
+                      int possible);
 
 /*--- FONCTION D'EVALUATION ---*/
 
