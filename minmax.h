@@ -6,7 +6,7 @@
 #define NB_FILS_MAX T_PLAT/2
 
 #define MIN(x, y) ((x)>(y)?(y):(x))
-#define MAX(x, y) (-MIN(-(x),-(y)))
+#define MAX(x, y) ((x)<(y)?(y):(x))
 
 typedef struct noeud_t{
     struct noeud_t* fils[NB_FILS_MAX]; //Tableau de pointeurs vers les fils. Il peut y avoir des NULL, si certains coups étaient impossibles.
@@ -45,7 +45,7 @@ void calcul_coup(Situation* s, int coup_joue);
  * La profondeur de l'arbre est précisée. */
 Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur, int coup);
 
-/*--- FONCTION D'EVALUATION ---*/
+/*--- FONCTIONS D'EVALUATION ---*/
 
 /* Fonction simple qui renvoie une valeur en fonction des points des joueurs.
  * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non. */
@@ -66,7 +66,7 @@ int minmax_leger(Situation s, int profondeur, int joueur_a_maximiser, int *coup)
 /// ELAGAGE ALPHA-BETA
 
 /* Minmax en appliquant la logique de l'élagage alpha-beta. La fonction d'évaluation à utiliser est donnée. */
-void minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int *alpha, int *beta, int (*eval)(Situation s, int joueur_a_maximiser));
+int minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation s, int joueur_a_maximiser));
 
 /// COMPARER LES FONCTIONS D'EVALUATION
 
@@ -83,7 +83,7 @@ typedef struct donnees_t{
 void coups_aleatoires(Situation *s, int n);
 
 /* Fonction qui lance k parties entre deux IA, utilisant les fonctions d'évalutations ainsi que les profondeurs données.
- * Les k/6 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée.
+ * Les k/6+1 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée.
  * Le troisième argument prend un tableau de pointeurs de fonctions de taille 2 (donc les deux fonctions d'évalutations)*/
 Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situation s, int joueur_a_maximiser));
 
