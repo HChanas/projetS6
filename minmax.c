@@ -125,3 +125,36 @@ Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situati
     }
     return (Donnees) {(float) nb_v_j1 / k, (float) nb_v_j2 / k, (float) tt_pts_j1 / k, (float) tt_pts_j2 / k};
 }
+
+
+void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
+    // cas ou le neud correspond au joeur a maximiser : 
+    int buff; // valeur intermediare qui sert a stocker la valeur minimum ou maximum a chaque fois  
+    int i; // compteur pour parcourir les feuilles 
+    if (racine->numero_joeur == joueur_a_maximiser) {
+        // parcourrir les fils et prendre le minimum 
+        buff = 999999999; //init le buff a une grande valeur   pour prendre même la premier valeur minimum  
+        while (i < racine->feuille) {
+            if (racine->fils[i] < buff ) {
+                buff = racine->fils[i]; 
+            }
+            i++; 
+        }
+        coup = buff; // si j'ai bien compris comment a quio sert la variable coup  
+    }
+    // cas ou le neud ne correspond pas au joeur a maximiser : 
+    else {
+        // on prend le max des fils 
+        buff = -1; // contraire a l'autre fonctionnement du min 
+        // même chose pour la boucle 
+        while (i < racine->feuille) {
+            if (racine->fils[i] > buff ) {
+                buff = racine->fils[i]; 
+            }
+            i++; 
+        }
+        coup = buff // A VERIFIER 
+    }
+    
+}
+
