@@ -163,7 +163,6 @@ void coups_aleatoires(Situation *s, int n) {
 Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situation,int)) {
   int nb_coups_alea = (int)(log((double)k)/log(6.0)) + 1, res, coup, nb_v_j1 = 0, nb_v_j2 = 0, tt_pts_j1 = 0, tt_pts_j2 = 0;
   //                    calcul de log6(k)
-    printf("%d\n",nb_coups_alea);
   for (int i = 0; i < k; i++) { // k parties
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s = {plateau, 0, 0, 0, 0};
