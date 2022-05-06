@@ -37,21 +37,11 @@ Noeud *nouvelle_arbre(int depth, int numero_joeur, Situation s, int coups,
     noeud->feuille = 1;
   } else {
     int *cp = coups_possibles(s);
-    for (int i = 0; i < NB_FILS_MAX * 2; i++) {
-      if (numero_joeur == 0 && i <= 6) {
-        if (cp[i] == 1) {
-          noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, 1);
-        } else {
-          noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, 0);
-        }
-      }
-
-      if (numero_joeur == 1 && i <= 12) {
-        if (cp[i] == 1) {
-          noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, 1);
-        } else {
-          noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, 0);
-        }
+    for (int i = 0; i < NB_FILS_MAX; i++) {
+      if (cp[i] == 1) {
+        noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, 1);
+      } else {
+        noeud->fils[i] = nouvelle_arbre(depth - 1, 1 - numero_joeur, s, i, 0);
       }
     }
   }
