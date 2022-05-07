@@ -135,8 +135,6 @@ int minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *c
 /// COMPARER LES FONCTIONS D'EVALUATION
 
 <<<<<<< HEAD
-
-
 int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
     int val_min_max = 0;  
     int buff = val_min_max; 
@@ -186,7 +184,6 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
                      tmp = i; 
                  }                 
              }
-
         }
     }
     *coup = tmp; 
