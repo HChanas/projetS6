@@ -4,6 +4,7 @@
 #include "jeu.h"
 
 #define NB_FILS_MAX T_PLAT/2
+#define INFINI 50
 
 #define MIN(x, y) ((x)>(y)?(y):(x))
 #define MAX(x, y) ((x)<(y)?(y):(x))
@@ -17,7 +18,7 @@ typedef struct noeud_t{
                // fonction d'évaluation.
     int feuille; // Indique si le noeud est une feuille pour simplifier des trucs
     int coups;
-    int numero_joeur;
+    int numero_joueur;
     int possible;
 } Noeud;
 
@@ -56,7 +57,8 @@ int evaluation(Situation s, int joueur_a_maximiser);
 /* En fonction de la valeur des feuilles données par la fonction d'évaluation,
  * calcule la valeur de tous les noeuds. coup permet de récupérer le coup à jouer.
  * joueur_a_maximiser correspond au joueur que l'on cherche à maximiser, i.e. celui qu'on cherche à faire gagner. */
-void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup);
+int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup);
+
 
 /// S'AFFRANCHIR DE L'ARBRE
 
@@ -65,8 +67,9 @@ int minmax_leger(Situation s, int profondeur, int joueur_a_maximiser, int *coup)
 
 /// ELAGAGE ALPHA-BETA
 
-/* Minmax en appliquant la logique de l'élagage alpha-beta. La fonction d'évaluation à utiliser est donnée. */
-int minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation s, int joueur_a_maximiser));
+/* Minmax en appliquant la logique de l'élagage alpha-beta, ainsi que la simplification Negamax, qui transforme EN GROS les 'min' en '-max'.
+ * La fonction d'évaluation à utiliser est donnée. */
+int negamax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation,int));
 
 /// COMPARER LES FONCTIONS D'EVALUATION
 

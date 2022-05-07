@@ -31,7 +31,7 @@ void jeu_solo(){
         }
         else{
             printf("Calcul des coups...\n");
-            minmax_alphabeta(s, 9, 1, &entree, -50, 50, evaluation);
+            negamax_alphabeta(s, 9, 1, &entree, -INFINI, INFINI, evaluation);
             printf("Trou choisi : %d\n", entree+(2*(T_PLAT/2-entree)));
         }
         //Répartition du tas en sens horaire
@@ -48,6 +48,10 @@ void jeu_solo(){
     }
 }
 
+int nb_appels = 0;
+int nb_cps = 0;
+int nb_coupures = 0;
+int nb_feuilles = 0;
 // ./awale nb_parties prof1 prof2
 int main(int argc, char** argv) {
     printf("%s <nombre de parties> <profondeur j1> <profondeur j2>\n", argv[0]);

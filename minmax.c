@@ -47,6 +47,8 @@ void calcul_coup(Situation *s, int coup) {
   repartition(*s, &coup);
   // Tas de billes mangés
   captures(s, &coup);
+  // Au tour du joueur suivant
+  s->joueur_tour = 1 - s->joueur_tour;
 }
 
 /* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
@@ -68,7 +70,6 @@ Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur,int coup){
         if(c_possibles[i]){
             Situation s2 = copie_situation(s);
             calcul_coup(&s2, i);
-            s2.joueur_tour = 1 - s2.joueur_tour;
             racine->fils[i-s.joueur_tour*6] = nouvel_arbre(s2, joueur_a_max, profondeur-1,i);
             free(s2.plateau);
         }
@@ -84,57 +85,11 @@ int evaluation(Situation s, int joueur) {
   return joueur == 0 ? s.pts_j1 - s.pts_j2 : s.pts_j2 - s.pts_j1;
 }
 
+/*--- EVALUATION DE L'ARBRE ---*/
 
-/// ELAGAGE ALPHA-BETA
-
-/* Minmax en appliquant la logique de l'élagage alpha-beta. La fonction d'évaluation à utiliser est donnée. */
-int minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation,int)){
-    if(profondeur==0)
-        return(eval(s, joueur_a_maximiser));    //une feuille : on calcule l'évaluation
-    int value = (joueur_a_maximiser==s.joueur_tour)?-50:50, m, c=0; //value = +l'infini ou -l'infini, +50 ou -50 car l'évalutaion ne peut pas renvoyer plus que ça
-    int* c_possibles = coups_possibles(s);  //tous les coups que le joueur peut jouer
-    for(int i=0; i<T_PLAT; i++){
-        if(c_possibles[i]){
-            Situation s2 = copie_situation(s);  //on copie la situation pour ne pas toucher à la situation donnée pour cet appel de la fonction
-            calcul_coup(&s2, i);    //on calcul le coup joué sur la copie de la situation initiale
-            s2.joueur_tour = 1 - s2.joueur_tour;    //après que le coup ait été joué, c'est au tour de l'adversaire
-            m = minmax_alphabeta(s2, profondeur-1, joueur_a_maximiser, coup, alpha, beta, eval);    //évaluation du coup qui vient d'être joué
-            if(joueur_a_maximiser==s.joueur_tour){  //noeud max
-                if(m>value){    
-                    c = i;
-                    value = m;
-                }
-                //revient à faire value = max(value, minmax(fils, ...)), mais en gardant i en mémoire en bonus
-
-                if(value >= beta) { //coupure beta
-                    free(s2.plateau);
-                    goto ret;
-                }
-                alpha = MAX(alpha,value);
-            }
-            else{
-                if(m<value){ //min(value, m)
-                    c = i;
-                    value = m;
-                }
-                if(alpha >= value) { //coupure alpha
-                    free(s2.plateau);
-                    goto ret;
-                }
-                beta = MIN(beta,value);
-            }
-            free(s2.plateau);
-        }
-    }
-    ret:
-    free(c_possibles);
-    *coup = c;
-    return value;
-}
-
-/// COMPARER LES FONCTIONS D'EVALUATION
-
-
+/* En fonction de la valeur des feuilles données par la fonction d'évaluation,
+ * calcule la valeur de tous les noeuds. coup permet de récupérer le coup à jouer.
+ * joueur_a_maximiser correspond au joueur que l'on cherche à maximiser, i.e. celui qu'on cherche à faire gagner. */
 int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
     int val_min_max = 0;  
     int buff = val_min_max; 
@@ -145,11 +100,10 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
         return racine->valeur;
     }
     for (int i = 0; i < NB_FILS_MAX; i++){
-        if (racine->numero_joueur == joueur_a_maximiser)
+        if (racine->fils[i] == NULL )
+            continue;
+        if (racine->numero_joueur == joueur_a_maximiser) {
         // prendre le min 
-        { 
-            if (racine->fils[i] == NULL )
-                continue;
             val_min_max = MAX(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
             // si la valeur change je veux le savoir pour recuperer l'indice du coup 
             if (buff != val_min_max) {
@@ -171,6 +125,59 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
     return val_min_max; 
 }
 
+/// ELAGAGE ALPHA-BETA
+
+/* Minmax en appliquant la logique de l'élagage alpha-beta, ainsi que la simplification Negamax, qui transforme EN GROS les 'min' en '-max'.
+ * La fonction d'évaluation à utiliser est donnée. */
+int negamax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation,int)){
+    int* c_possibles = coups_possibles(s);  //tous les coups que le joueur peut jouer
+    if((profondeur==0)||(nb_cp(c_possibles, T_PLAT)==0)){
+        free(c_possibles);
+        return (s.joueur_tour==joueur_a_maximiser)?eval(s, joueur_a_maximiser):-eval(s, joueur_a_maximiser);
+    }    //une feuille : on calcule l'évaluation
+    int valeur = -INFINI, coup_tmp=0, res;
+    for(int i=0; i<T_PLAT; i++){
+        if(c_possibles[i]){
+            Situation s2 = copie_situation(s);  //on copie la situation pour ne pas toucher à la situation donnée pour cet appel de la fonction
+            calcul_coup(&s2, i);    //on calcul le coup joué sur la copie de la situation initiale
+            res = -negamax_alphabeta(s2, profondeur-1, joueur_a_maximiser, coup, -beta, -alpha, eval);
+            if(res>valeur){
+                valeur=res;
+                coup_tmp = i;
+            }
+            alpha = MAX(alpha, valeur);
+            if(alpha >= beta){
+                free(s2.plateau);
+                goto ret;
+            }
+            free(s2.plateau);
+        }
+    }
+    ret:
+    free(c_possibles);
+    *coup = coup_tmp;
+    return valeur;
+}
+
+/// COMPARER LES FONCTIONS D'EVALUATION
+
+/* Fonction qui joue n coups de façon aléatoire sur une partie. */
+void coups_aleatoires(Situation *s, int n) {
+    for (int i = 0; i < n; i++) {
+        int *cp = coups_possibles(*s);
+        int ncp = nb_cp(cp, T_PLAT); // on compte les cases à 1
+        int rd = rand() % ncp;       // un nombre entre 0 et le nombre de cases à 1
+        int compteur = 0, j;
+        for (j = 0; j < T_PLAT; j++) { // on fait correspondre le nombre tiré à la bonne case du tableau
+            if (cp[j])
+                compteur++;
+            if (compteur > rd)
+                break;
+        }
+        free(cp);
+        calcul_coup(s, j);
+    }
+}
 
 /* Fonction qui lance k parties entre deux IA, utilisant les fonctions
  * d'évalutations ainsi que les profondeurs données. Les log6(k)+1 premiers coups
@@ -186,7 +193,7 @@ Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situati
     coups_aleatoires(&s, nb_coups_alea);
     //si on commence du même point à chaque fois les parties seront strictement identiques, donc on fais des coups aléatoires
     while (1) {
-      minmax_alphabeta(s, profondeurs[s.joueur_tour], s.joueur_tour, &coup, -50, 50, eval[s.joueur_tour]);
+      negamax_alphabeta(s, profondeurs[s.joueur_tour], s.joueur_tour, &coup, -50, 50, eval[s.joueur_tour]);
       // calcul du prochain coup avec la fonction d'évaluation choisie pour ce joueur
       repartition(s, &coup);
       captures(&s, &coup);
