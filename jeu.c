@@ -31,6 +31,7 @@ int verif_fin(Situation s){
     if(s.pts_j1>=25) return 1;
     if(s.pts_j2>=25) return 2;
     if(verif_partie_infinie(s)||(s.pts_j1+s.pts_j2==48)) return 3;
+    if(s.nb_coups>=NB_MAX_COUPS) return 4;
     return 0;
 }
 
@@ -118,6 +119,7 @@ int nb_cp(int* cp, int taille){
 /* Réparti les billes du tas choisi dans les tas suivants selon le
  * principe de l'awalé. */
 void repartition(Situation s, int* trou){
+    if((*trou<0)||(*trou>11)) return;
     int depart = *trou;
     int nb_pierres = s.plateau[*trou];
     s.plateau[*trou] = 0;

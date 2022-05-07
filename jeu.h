@@ -3,12 +3,14 @@
 
 #define T_PLAT 12
 #define INIT_TAB 4,4,4,4,4,4,4,4,4,4,4,4
+#define NB_MAX_COUPS 100
 
 typedef struct situation_t{ //enregistre l'état d'une partie
     int* plateau;       //le plateau
     int pts_j1;         //points du joueur 1
     int pts_j2;         //joueur 2
     int joueur_tour;    //le joueur à qui c'est le tour de jouer
+    unsigned nb_coups;  //compte les coups joués pour y mettre une limite
 } Situation;
 
 /* Lance une partie entre deux joueurs humains (local). */
