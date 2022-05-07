@@ -127,34 +127,61 @@ Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situati
 }
 
 
-void eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
-    // cas ou le neud correspond au joeur a maximiser : 
-    int buff; // valeur intermediare qui sert a stocker la valeur minimum ou maximum a chaque fois  
-    int i; // compteur pour parcourir les feuilles 
-    if (racine->numero_joeur == joueur_a_maximiser) {
-        // parcourrir les fils et prendre le minimum 
-        buff = 999999999; //init le buff a une grande valeur   pour prendre même la premier valeur minimum  
-        while (i < racine->feuille) {
-            if (racine->fils[i]->valeur < buff ) {
-                buff = racine->fils[i]->valeur; 
-            }
-            i++; 
-        }
-        coup = &buff; // si j'ai bien compris comment a quio sert la variable coup  
+
+
+int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
+    int val_min_max = 0;  
+    int buff = val_min_max; 
+    int tmp  = 0; 
+    if (racine == NULL )
+        return val_min_max;
+    if (racine->feuille == 1) {
+        return racine->valeur;
     }
-    // cas ou le neud ne correspond pas au joeur a maximiser : 
-    else {
-        // on prend le max des fils 
-        buff = -1; // contraire a l'autre fonctionnement du min 
-        // même chose pour la boucle 
-        while (i < racine->feuille) {
-            if (racine->fils[i]->valeur  > buff ) {
-                buff = racine->fils[i]->valeur; 
-            }
-            i++; 
+    for (int i = 0; i < NB_FILS_MAX; i++){
+        if (racine->numero_joeur == joueur_a_maximiser)
+        // prendre le min 
+         { 
+             if (racine->fils[i] == NULL ) {
+                 return val_min_max; 
+             }
+             if (racine->fils[i]->feuille == 0) {
+                 val_min_max = MIN(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
+                 // si la valeur change je veux le savoir pour recuperer l'indice du coup 
+                 if (buff != val_min_max) {
+                     buff  = val_min_max; 
+                     tmp = i; 
+                 }                 
+             }
+             else  {
+                 val_min_max = MIN(racine->fils[i]->valeur,val_min_max);  
+                 if (buff != val_min_max) {
+                     buff  = val_min_max; 
+                     tmp = i; 
+                 }                 
+             }
         }
-        coup = &buff; // si j'ai bien compris comment a quio sert la variable coup  
+        // prendre le max
+        else { 
+             if (racine->fils[i]->feuille == 0) {
+                 val_min_max = MAX(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
+                 // si la valeur change je veux le savoir pour recuperer l'indice du coup 
+                 if (buff != val_min_max) {
+                     buff  = val_min_max; 
+                     tmp = i; 
+                 }                 
+             }
+             else  {
+                 val_min_max = MAX(racine->fils[i]->valeur,val_min_max);  
+                 if (buff != val_min_max) {
+                     buff  = val_min_max; 
+                     tmp = i; 
+                 }                 
+             }
+
+        }
     }
-    
+    *coup = tmp; 
+    return val_min_max; 
 }
 
