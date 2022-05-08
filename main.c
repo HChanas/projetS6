@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-int nb_appels = 0;
-
 void jeu_solo(int profondeur){
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s ={plateau, 0, 0, 0, 0};
@@ -18,9 +16,7 @@ void jeu_solo(int profondeur){
         }
         else{
             printf("Calcul des coups...\n");
-            nb_appels=0;
             negamax_alphabeta(s,profondeur,1,&entree,-INFINI,INFINI,evaluation);
-            printf("nb appels > %d\n", nb_appels);
             //negamax_alphabeta(s, profondeur, 1, &entree, -INFINI, INFINI, evaluation);
             printf("Trou choisi : %d\n", entree+(2*(T_PLAT/2-entree)));
         }
