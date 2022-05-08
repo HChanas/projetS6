@@ -65,7 +65,7 @@ void tour_de_jeu(Situation* s){
             printf(" %d ", i);
         else
             printf("   ");
-    printf("\nTour du joueur %d : Choisis un trou maintenant ou conséquences\n", s->joueur_tour+1);
+    printf("\nTour du joueur %d : Choisis un trou\n", s->joueur_tour+1);
     int entree; char *buf = malloc(16);
     scanf("%s", buf); entree = atoi(buf);
     entree += s->joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau

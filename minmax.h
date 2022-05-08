@@ -1,6 +1,7 @@
 #ifndef MINMAX_H
 #define MINMAX_H
 
+#include <string.h>
 #include "jeu.h"
 
 #define NB_FILS_MAX T_PLAT/2
@@ -8,6 +9,9 @@
 
 #define MIN(x, y) ((x)>(y)?(y):(x))
 #define MAX(x, y) ((x)<(y)?(y):(x))
+
+#define EN_SEC(x) ((double)(x)/CLOCKS_PER_SEC)
+//permet de convertir un nombre de ticks de système en secondes
 
 typedef struct noeud_t{
     struct noeud_t* fils[NB_FILS_MAX]; //Tableau de pointeurs vers les fils. Il peut y avoir des NULL, si certains coups étaient impossibles.
@@ -35,6 +39,12 @@ void print_tree(Noeud *racine, int depth);
 /* Copie d'une situation (notamment le plateau). Plateau à free ! */
 Situation copie_situation(Situation s);
 
+/*--- FONCTIONS D'EVALUATION ---*/
+
+/* Fonction simple qui renvoie une valeur en fonction des points des joueurs.
+ * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non. */
+int evaluation(Situation s, int joueur_a_maximiser);
+
 /*--- GENERATION DE L'ARBRE ---*/
 
 /* Utilise les fonction du jeu pour calculer le plateau et les points des joueurs si le coup indiqué est joué.
@@ -45,12 +55,6 @@ void calcul_coup(Situation* s, int coup_joue);
 /* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
  * La profondeur de l'arbre est précisée. */
 Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur, int coup);
-
-/*--- FONCTIONS D'EVALUATION ---*/
-
-/* Fonction simple qui renvoie une valeur en fonction des points des joueurs.
- * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non. */
-int evaluation(Situation s, int joueur_a_maximiser);
 
 /*--- EVALUATION DE L'ARBRE ---*/
 
@@ -89,5 +93,25 @@ void coups_aleatoires(Situation *s, int n);
  * Les k/6+1 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée.
  * Le troisième argument prend un tableau de pointeurs de fonctions de taille 2 (donc les deux fonctions d'évalutations)*/
 Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situation s, int joueur_a_maximiser));
+
+/// COMPARER LES PERFORMANCES DES ALGORITHMES
+
+/* Permet d'indiquer une fonction à utiliser. */
+typedef enum fonction_a_utiliser{
+    arbre,  //nouvel_arbre et eval_arbre
+    leger,  //minmax_leger
+    alphabeta   //negamax_alphabeta
+} e_algo;
+
+/* Pour l'affichage, modifie buf et le renvoie. */
+char* e_algo_to_str(e_algo a, char* buf, size_t size);
+
+/* Utilisée dans le main pour gérer les arguments du programme. */
+e_algo str_to_e_algo(char* str);
+
+/* Fonction qui joue k parties entre deux IA, comme affrontements_successifs,
+ * mais mesure et affiche le temps total utilisé pour chaque IA à la fin.
+ * algo_1 et algo_2 indiquent quelle fonction les IA utilisent. */
+void test_de_performances(int k, int profondeur, e_algo algo_1, e_algo algo_2);
 
 #endif
