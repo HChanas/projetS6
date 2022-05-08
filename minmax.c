@@ -5,8 +5,6 @@
 #include <math.h>
 #include <time.h>
 
-extern int nb_appels;
-
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
 
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
@@ -149,7 +147,6 @@ int minmax_leger(Situation s, int profondeur, int joueur_a_maximiser, int *coup)
 /* Minmax en appliquant la logique de l'élagage alpha-beta, ainsi que la simplification Negamax, qui transforme EN GROS les 'min(x,y)' en '-max(-x,-y)'.
  * La fonction d'évaluation à utiliser est donnée. */
 int negamax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation,int)){
-    nb_appels++;
     int* c_possibles = coups_possibles(s);  //tous les coups que le joueur peut jouer
     if((profondeur==0)||(nb_cp(c_possibles, T_PLAT)==0)){
         free(c_possibles);

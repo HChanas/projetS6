@@ -8,26 +8,50 @@
  * Cela permet de faciliter la répartition des tas en sens horaire. 
  */
 
+int scan_entree(Situation s){
+    int* cp = coups_possibles(s);
+    for(int i=1, j=s.joueur_tour==0?0:T_PLAT-1; i<T_PLAT+1; i++, j+=s.joueur_tour==0?1:-1)
+        if(cp[j])
+            printf(" %d ", i);
+        else
+            printf("   ");
+    printf("\nTour du joueur %d : Choisis un trou\n", s.joueur_tour+1);
+    int entree;
+    scanf("%d", &entree);
+    entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
+    while(trou_valide(cp, entree)){
+        printf("Trou invalide.\n");
+        scanf("%d", &entree);
+        entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1;
+    }
+    free(cp);
+    return entree;
+}
+
 /* Lance une partie entre deux joueurs humains (local). */
 void partie_pvp(){
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s = {plateau, 0, 0, 0};
     while(1){
         affiche_jeu(s);
-        tour_de_jeu(&s);
+        int entree = scan_entree(s);
+        calcul_coup(&s, entree);
         switch(verif_fin(s)){
             case 1: printf("Victoire joueur 1\n"); return;
             case 2: printf("Victoire joueur 2\n"); return;
+            case 3: printf("Egalité\n"); return;
             default: break;
         }
     }
 }
 
 /* Vérifie si la partie est finie.
- * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné. */
+ * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné ; 3 -> égalité. */
 int verif_fin(Situation s){
     if((s.pts_j1>=25)||(s.pts_j2>=25))
         return (s.pts_j2>s.pts_j1)+1; //celui qui a le plus de points
+    if(s.pts_j1+s.pts_j2==48)
+        return 3; //24 à 24
     return 0;
 }
 
@@ -49,31 +73,6 @@ void affiche_plateau(int* plateau){
         printf("|%-2d", plateau[i]);
     printf("|%-2d|\n", plateau[moitie+1]);
     printf("Joueur 2\n");
-}
-
-/* Demande une trou au joueur, effectue la répartition du tas choisi, 
- * gère le mangeage de billes si besoin et calcule les points. */
-//demande une entrée correspondant à une trou et réparti les pierres comme dans les règles du jeu regarde sur la page wikipédia tu crois que je vais détailler les règles ici ?
-void tour_de_jeu(Situation* s){
-    int* cp = coups_possibles(*s);
-    for(int i=1, j=s->joueur_tour==0?0:T_PLAT-1; i<T_PLAT+1; i++, j+=s->joueur_tour==0?1:-1)
-        if(cp[j])
-            printf(" %d ", i);
-        else
-            printf("   ");
-    printf("\nTour du joueur %d : Choisis un trou\n", s->joueur_tour+1);
-    int entree; char *buf = malloc(16);
-    scanf("%s", buf); entree = atoi(buf);
-    entree += s->joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
-    while(trou_valide(cp, entree)){
-        printf("Trou invalide.\n");
-        scanf("%s", buf); entree = atoi(buf);
-        entree += s->joueur_tour==1?(2*(T_PLAT/2-entree)):-1;
-    }
-    //numéro de trou demandé : 1 - 6
-    //camp du joueur 1 (0) : trous 0 - 5
-    //camp du joueur 2 (1) : trous 11 - 6 (besoin de convertir)
-    calcul_coup(s, entree);
 }
 
 /* Vérifie en fonction du tableau de coups possibles si l'entrée en est. */
@@ -144,22 +143,21 @@ int affame(Situation s, int trou){
 /* Vérifie les tas capturés selon les règles et calcule les points gagnés. */
 void captures(Situation* s, int* trou){
     //tant que le trou a 2 ou 3 billes et est dans le camp adverse on prend
-    if(affame(*s, *trou))//règle du jeu qui dit qu'on ne capture pas si
-    //le coup permet de capturer toutes les graines du camp adverse (affamer)
-        goto fin;
-    while(((s->plateau[*trou]==2)||(s->plateau[*trou]==3))&&(s->joueur_tour!=camp(*trou))){
-        if(s->joueur_tour) s->pts_j2 += s->plateau[*trou];
-        else s->pts_j1 += s->plateau[*trou];
-        s->plateau[*trou] = 0;
-        (*trou)--;
-        if(*trou<0)
-            *trou = T_PLAT-1;
+    if(!affame(*s, *trou)){//règle du jeu qui dit qu'on ne capture pas si
+    //le coup permet de capturer toutes les graines du camp adverse (affamer)    
+        while(((s->plateau[*trou]==2)||(s->plateau[*trou]==3))&&(s->joueur_tour!=camp(*trou))){
+            if(s->joueur_tour) s->pts_j2 += s->plateau[*trou];
+            else s->pts_j1 += s->plateau[*trou];
+            s->plateau[*trou] = 0;
+            (*trou)--;
+            if(*trou<0)
+                *trou = T_PLAT-1;
+        }
     }
-    fin:
     s->nb_coups++;
     if(verif_famine(s))
         grande_capture_finale(s, s->joueur_tour==0, s->joueur_tour==1);
-    if(s->nb_coups>=NB_MAX_COUPS) //si la partie tourne en boucle (car le nb de coup est trop grand)
+    if(s->nb_coups>NB_MAX_COUPS) //si la partie tourne en boucle (car le nb de coup est trop grand)
         grande_capture_finale(s, 1, 1);
     if(verif_partie_infinie(*s)) //détecte un cas particulier de partie infinie avant que le nb de coups soit trop grand...
         grande_capture_finale(s, 1, 1);
@@ -227,7 +225,6 @@ int verif_famine(Situation* s){
         for(int i = s->joueur_tour?0:T_PLAT/2; i<max; i++)
             if(s->plateau[i]>=max-i) //si il y a assez de graines pour nourrir l'adversaire
                 return 0;
-
         return 1;
     }
     return 0;

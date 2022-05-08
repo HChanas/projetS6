@@ -1,9 +1,9 @@
 #ifndef JEU_H
 #define JEU_H
 
-#define T_PLAT 12
-#define INIT_TAB 4,4,4,4,4,4,4,4,4,4,4,4
-#define NB_MAX_COUPS 100
+#define T_PLAT 12   //taille du plateau
+#define INIT_TAB 4,4,4,4,4,4,4,4,4,4,4,4 //pour initialiser le plateau
+#define NB_MAX_COUPS 100    //coups avant qu'une partie s'arrête car probablement cyclique
 
 typedef struct situation_t{ //enregistre l'état d'une partie
     int* plateau;       //le plateau
@@ -13,6 +13,9 @@ typedef struct situation_t{ //enregistre l'état d'une partie
     int nb_coups;  //compte les coups joués pour y mettre une limite
 } Situation;
 
+
+/* récupère une entrée dans le terminal pour savoir quel coup le joueur veut jouer. */
+int scan_entree(Situation s);
 /* Lance une partie entre deux joueurs humains (local). */
 void partie_pvp();
 /* Vérifie si la partie est finie.
@@ -22,9 +25,6 @@ int verif_fin(Situation s);
 void affiche_jeu(Situation s);
 /* Affiche les trous du plateau de jeu. */
 void affiche_plateau(int* plateau);
-/* Demande une trou au joueur, effectue la répartition du tas choisi, 
- * gère le mangeage de billes si besoin et calcule les points. */
-void tour_de_jeu(Situation* s);
 /* Vérifie en fonction du tableau de coups possibles si l'entrée en est. */
 int trou_valide(int* cp, int entree);
 /* Calcule les coups possibles pour le tour d'un joueur et renvoie

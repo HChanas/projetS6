@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+int nb_appels = 0;
+
 void jeu_solo(int profondeur){
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s ={plateau, 0, 0, 0, 0};
@@ -12,39 +14,22 @@ void jeu_solo(int profondeur){
     while((fn=verif_fin(s))==0){
         affiche_jeu(s);
         if(s.joueur_tour==0){
-            int* cp = coups_possibles(s);
-            for(int i=1, j=0; i<T_PLAT+1; i++, j++)
-                if(cp[j])
-                    printf(" %d ", i);
-                else
-                    printf("   ");
-            printf("\nChoisis un trou\n");
-            char buf[16];
-            scanf("%s", buf); entree = atoi(buf);
-            entree--;
-            while(trou_valide(cp, entree)){
-                printf("Trou invalide.\n");
-                scanf("%s", buf); entree = atoi(buf);
-                entree--;
-            }
-            free(cp);
+            entree = scan_entree(s);
         }
         else{
             printf("Calcul des coups...\n");
+            nb_appels=0;
             negamax_alphabeta(s,profondeur,1,&entree,-INFINI,INFINI,evaluation);
+            printf("nb appels > %d\n", nb_appels);
             //negamax_alphabeta(s, profondeur, 1, &entree, -INFINI, INFINI, evaluation);
             printf("Trou choisi : %d\n", entree+(2*(T_PLAT/2-entree)));
         }
-        //Répartition du tas en sens horaire
-        repartition(s, &entree);
-        //Tas de billes mangés
-        captures(&s, &entree);
-        s.joueur_tour = 1 - s.joueur_tour;
+        calcul_coup(&s, entree);
     }
     switch(verif_fin(s)){
         case 1: printf("Victoire joueur 1\n"); return;
         case 2: printf("Victoire joueur 2\n"); return;
-        case 3: printf("Egalite\n"); return;
+        case 3: printf("Egalité\n"); return;
         default: break;
     }
 }
