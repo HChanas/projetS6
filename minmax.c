@@ -134,11 +134,11 @@ int minmax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *c
 
 /// COMPARER LES FONCTIONS D'EVALUATION
 
-<<<<<<< HEAD
 int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
     int val_min_max = 0;  
     int buff = val_min_max; 
     int tmp  = 0; 
+    //printf("val --> %d",val_min_max);  
     if (racine == NULL )
         return val_min_max;
     if (racine->feuille == 1) {
@@ -146,50 +146,32 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
     }
     for (int i = 0; i < NB_FILS_MAX; i++){
         if (racine->numero_joeur == joueur_a_maximiser)
-        // prendre le min 
          { 
-             if (racine->fils[i] == NULL ) {
-                 return val_min_max; 
+             if (racine->fils[i] == NULL ) 
+             {
+                 continue;  
              }
-             if (racine->fils[i]->feuille == 0) {
-                 val_min_max = MIN(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
-                 // si la valeur change je veux le savoir pour recuperer l'indice du coup 
-                 if (buff != val_min_max) {
-                     buff  = val_min_max; 
-                     tmp = i; 
-                 }                 
-             }
-             else  {
-                 val_min_max = MIN(racine->fils[i]->valeur,val_min_max);  
-                 if (buff != val_min_max) {
-                     buff  = val_min_max; 
-                     tmp = i; 
-                 }                 
-             }
+            val_min_max = MIN(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
+            //// si la valeur change je veux le savoir pour recuperer l'indice du coup 
+            if (buff != val_min_max) {
+                buff  = val_min_max; 
+                tmp = i; 
+                printf("%d tmp \n",tmp);
+            }                 
         }
-        // prendre le max
+         //prendre le max
         else { 
-             if (racine->fils[i]->feuille == 0) {
                  val_min_max = MAX(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
                  // si la valeur change je veux le savoir pour recuperer l'indice du coup 
                  if (buff != val_min_max) {
                      buff  = val_min_max; 
                      tmp = i; 
                  }                 
-             }
-             else  {
-                 val_min_max = MAX(racine->fils[i]->valeur,val_min_max);  
-                 if (buff != val_min_max) {
-                     buff  = val_min_max; 
-                     tmp = i; 
-                 }                 
-             }
         }
     }
     *coup = tmp; 
-    return val_min_max; 
+    return  val_min_max; 
 }
-=======
 /* Fonction qui joue n coups de façon aléatoire sur une partie. */
 void coups_aleatoires(Situation *s, int n) {
   for (int i = 0; i < n; i++) {
@@ -209,7 +191,6 @@ void coups_aleatoires(Situation *s, int n) {
     captures(s, &j);
     s->joueur_tour = 1 - s->joueur_tour;
   }
->>>>>>> 34381c39843124dfd7a140045c10241282a27e37
 }
 
 /* Fonction qui lance k parties entre deux IA, utilisant les fonctions
