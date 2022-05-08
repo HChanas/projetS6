@@ -5,6 +5,8 @@
 #include <math.h>
 #include <time.h>
 
+extern int nb_appels;
+
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
 
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
@@ -45,18 +47,6 @@ int evaluation(Situation s, int joueur) {
 }
 
 /*--- GENERATION DE L'ARBRE ---*/
-
-/* Utilise les fonction du jeu pour calculer le plateau et les points des joueurs si le coup indiqué est joué.
- * Cette fonction ressemble donc à tour_de_jeu(), mais sans demander le coup dans le terminal. 
- * Il faut vérifier avant d'appeler cette fonction quels sont les coups possibles. */
-void calcul_coup(Situation *s, int coup) {
-    // Répartition du tas en sens horaire
-    repartition(*s, &coup);
-    // Tas de billes mangés
-    captures(s, &coup);
-    // Au tour du joueur suivant
-    s->joueur_tour = 1 - s->joueur_tour;
-}
 
 /* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
  * La profondeur de l'arbre est précisée. */
@@ -159,6 +149,7 @@ int minmax_leger(Situation s, int profondeur, int joueur_a_maximiser, int *coup)
 /* Minmax en appliquant la logique de l'élagage alpha-beta, ainsi que la simplification Negamax, qui transforme EN GROS les 'min(x,y)' en '-max(-x,-y)'.
  * La fonction d'évaluation à utiliser est donnée. */
 int negamax_alphabeta(Situation s, int profondeur, int joueur_a_maximiser, int *coup, int alpha, int beta, int (*eval)(Situation,int)){
+    nb_appels++;
     int* c_possibles = coups_possibles(s);  //tous les coups que le joueur peut jouer
     if((profondeur==0)||(nb_cp(c_possibles, T_PLAT)==0)){
         free(c_possibles);
@@ -225,7 +216,6 @@ Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situati
             negamax_alphabeta(s, profondeurs[s.joueur_tour], s.joueur_tour, &coup, -INFINI, INFINI, eval[s.joueur_tour]);
             // calcul du prochain coup avec la fonction d'évaluation choisie pour ce joueur
             calcul_coup(&s, coup);
-            s.nb_coups++;
             res = verif_fin(s);
             if (res == 0)
                 continue;
@@ -295,7 +285,6 @@ void test_de_performances(int k, int profondeur, e_algo algo_1, e_algo algo_2){
             ticks[s.joueur_tour] += apres - avant;
             // calcul du prochain coup avec la fonction d'évaluation choisie pour ce joueur
             calcul_coup(&s, coup);
-            s.nb_coups++;
             if(verif_fin(s))
                 break;
         }

@@ -47,11 +47,6 @@ int evaluation(Situation s, int joueur_a_maximiser);
 
 /*--- GENERATION DE L'ARBRE ---*/
 
-/* Utilise les fonction du jeu pour calculer le plateau et les points des joueurs si le coup indiqué est joué.
- * Cette fonction ressemble donc à tour_de_jeu(), mais sans demander le coup dans le terminal. 
- * Il faut vérifier avant d'appeler cette fonction quels sont les coups possibles. */
-void calcul_coup(Situation* s, int coup_joue);
-
 /* Génère un arbre de possibilités à partir d'un plateau de jeu et du joueur qui va jouer.
  * La profondeur de l'arbre est précisée. */
 Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur, int coup);

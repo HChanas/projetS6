@@ -15,23 +15,19 @@ void partie_pvp(){
     while(1){
         affiche_jeu(s);
         tour_de_jeu(&s);
-        s.joueur_tour = 1-s.joueur_tour;
         switch(verif_fin(s)){
             case 1: printf("Victoire joueur 1\n"); return;
             case 2: printf("Victoire joueur 2\n"); return;
-            case 3: printf("Egalite\n"); return;
             default: break;
         }
     }
 }
 
 /* Vérifie si la partie est finie.
- * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné ; 3 -> égalité. */
+ * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné. */
 int verif_fin(Situation s){
-    if(s.pts_j1>=25) return 1;
-    if(s.pts_j2>=25) return 2;
-    if(verif_partie_infinie(s)||(s.pts_j1+s.pts_j2==48)) return 3;
-    if(s.nb_coups>=NB_MAX_COUPS) return 4;
+    if((s.pts_j1>=25)||(s.pts_j2>=25))
+        return (s.pts_j2>s.pts_j1)+1; //celui qui a le plus de points
     return 0;
 }
 
@@ -77,11 +73,7 @@ void tour_de_jeu(Situation* s){
     //numéro de trou demandé : 1 - 6
     //camp du joueur 1 (0) : trous 0 - 5
     //camp du joueur 2 (1) : trous 11 - 6 (besoin de convertir)
-
-    //Répartition du tas en sens horaire
-    repartition(*s, &entree);
-    //Tas de billes mangés
-    captures(s, &entree);
+    calcul_coup(s, entree);
 }
 
 /* Vérifie en fonction du tableau de coups possibles si l'entrée en est. */
@@ -154,7 +146,7 @@ void captures(Situation* s, int* trou){
     //tant que le trou a 2 ou 3 billes et est dans le camp adverse on prend
     if(affame(*s, *trou))//règle du jeu qui dit qu'on ne capture pas si
     //le coup permet de capturer toutes les graines du camp adverse (affamer)
-        goto vf;
+        goto fin;
     while(((s->plateau[*trou]==2)||(s->plateau[*trou]==3))&&(s->joueur_tour!=camp(*trou))){
         if(s->joueur_tour) s->pts_j2 += s->plateau[*trou];
         else s->pts_j1 += s->plateau[*trou];
@@ -163,7 +155,26 @@ void captures(Situation* s, int* trou){
         if(*trou<0)
             *trou = T_PLAT-1;
     }
-    vf: verif_famine(s);
+    fin:
+    s->nb_coups++;
+    if(verif_famine(s))
+        grande_capture_finale(s, s->joueur_tour==0, s->joueur_tour==1);
+    if(s->nb_coups>=NB_MAX_COUPS) //si la partie tourne en boucle (car le nb de coup est trop grand)
+        grande_capture_finale(s, 1, 1);
+    if(verif_partie_infinie(*s)) //détecte un cas particulier de partie infinie avant que le nb de coups soit trop grand...
+        grande_capture_finale(s, 1, 1);
+}
+
+/* Utilise les fonction du jeu pour calculer le plateau et les points des joueurs si le coup indiqué est joué.
+ * Cette fonction ressemble donc à tour_de_jeu(), mais sans demander le coup dans le terminal. 
+ * Il faut vérifier avant d'appeler cette fonction quels sont les coups possibles. */
+void calcul_coup(Situation *s, int coup) {
+    // Répartition du tas en sens horaire
+    repartition(*s, &coup);
+    // Tas de billes mangés
+    captures(s, &coup);
+    // Au tour du joueur suivant
+    s->joueur_tour = 1 - s->joueur_tour;
 }
 
 /* Dans quel camp est le trou (0 ou 1) -1 => trou invalide. */
@@ -208,20 +219,30 @@ int verif_partie_infinie(Situation s){
     return 0;
 }
 
-void verif_famine(Situation* s){
+/* Vérifie si le joueur est affamé ET que son adversaire ne peut pas le nourrir.
+ * Dans ce cas l'adversaire capture toutes les billes restantes (fin par famine). */
+int verif_famine(Situation* s){
     if(est_affame(s->plateau, s->joueur_tour)){
         int max = s->joueur_tour?T_PLAT/2:T_PLAT;
         for(int i = s->joueur_tour?0:T_PLAT/2; i<max; i++)
-            if(s->plateau[i]>=max-i) //si il n'y a pas assez de graines pour nourrir l'adversaire
-                return;
-        //sinon l'adversaire capture tout
-        for(int i=0; i<T_PLAT; i++)
+            if(s->plateau[i]>=max-i) //si il y a assez de graines pour nourrir l'adversaire
+                return 0;
+
+        return 1;
+    }
+    return 0;
+}
+
+/* Toutes les graines qui restent sur le plateau sont capturées.
+ * j1_capture et j2_capture indiquent si le joueur récupère les points ou non.
+ * Les deux joueurs peuvent capturer les graines en même temps. */
+void grande_capture_finale(Situation* s, int j1_capture, int j2_capture){
+    for(int i=0; i<T_PLAT; i++)
             if(s->plateau[i]){
-                if(s->joueur_tour)
+                if(j1_capture)
                     s->pts_j1 += s->plateau[i];
-                else
+                if(j2_capture)
                     s->pts_j2 += s->plateau[i];
                 s->plateau[i] = 0;
             }
-    }
 }
