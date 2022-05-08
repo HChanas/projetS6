@@ -16,12 +16,12 @@ int scan_entree(Situation s){
         else
             printf("   ");
     printf("\nTour du joueur %d : Choisis un trou\n", s.joueur_tour+1);
-    int entree=0;
-    scanf("%d", &entree);
+    int entree=0; char buf[16];
+    scanf("%s", buf); entree = atoi(buf);
     entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
     while(trou_valide(cp, entree)){
         printf("Trou invalide.\n");
-        scanf("%d", &entree);
+        scanf("%s", buf); entree = atoi(buf);
         entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1;
     }
     free(cp);
