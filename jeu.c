@@ -16,7 +16,7 @@ int scan_entree(Situation s){
         else
             printf("   ");
     printf("\nTour du joueur %d : Choisis un trou\n", s.joueur_tour+1);
-    int entree;
+    int entree=0;
     scanf("%d", &entree);
     entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
     while(trou_valide(cp, entree)){
