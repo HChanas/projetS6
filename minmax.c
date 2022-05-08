@@ -55,12 +55,14 @@ Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur,int coup){
     racine->feuille=0;
     racine->valeur=696969;
     racine->coups=coup;
-    if(profondeur==0){
+    racine->numero_joueur = s.joueur_tour;
+    int* c_possibles = coups_possibles(s);
+    if((profondeur==0)||(nb_cp(c_possibles, T_PLAT)==0)){
         racine->feuille = 1;
         racine->valeur = evaluation(s, joueur_a_max);
+        free(c_possibles);
         return racine;
     }
-    int* c_possibles = coups_possibles(s);
     for(int i=0; i<T_PLAT; i++){
         if(c_possibles[i]){
             Situation s2 = copie_situation(s);
@@ -79,7 +81,7 @@ Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur,int coup){
  * calcule la valeur de tous les noeuds. coup permet de récupérer le coup à jouer.
  * joueur_a_maximiser correspond au joueur que l'on cherche à maximiser, i.e. celui qu'on cherche à faire gagner. */
 int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
-    int val_min_max = 0;  
+    int val_min_max = racine->numero_joueur==joueur_a_maximiser?-INFINI:INFINI;  
     int buff = val_min_max; 
     int tmp  = 0; 
     if (racine == NULL )
@@ -91,7 +93,7 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
         if (racine->fils[i] == NULL )
             continue;
         if (racine->numero_joueur == joueur_a_maximiser) {
-        // prendre le min 
+        // prendre le max 
             val_min_max = MAX(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
             // si la valeur change je veux le savoir pour recuperer l'indice du coup 
             if (buff != val_min_max) {
@@ -99,17 +101,17 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
                 tmp = i; 
             }                 
         }
-        // prendre le max
+        // prendre le min
         else { 
             val_min_max = MIN(eval_arbre(racine->fils[i],joueur_a_maximiser,coup),val_min_max); 
             // si la valeur change je veux le savoir pour recuperer l'indice du coup 
             if (buff != val_min_max) {
                 buff  = val_min_max; 
-                tmp = i; 
+                tmp = i;
             }                 
         }
     }
-    *coup = tmp; 
+    *coup = tmp+6*joueur_a_maximiser; 
     return val_min_max; 
 }
 
@@ -117,16 +119,16 @@ int eval_arbre(Noeud* racine, int joueur_a_maximiser, int* coup) {
 
 /* Version sans contruction d'arbre, pour éviter de consommer de la mémoire. */
 int minmax_leger(Situation s, int profondeur, int joueur_a_maximiser, int *coup){
-    if(profondeur==0){
+    int* c_possibles = coups_possibles(s);
+    if((profondeur==0)||(nb_cp(c_possibles, T_PLAT)==0)){
+        free(c_possibles);
         return(evaluation(s, joueur_a_maximiser));
     }
     int value = (joueur_a_maximiser==s.joueur_tour)?-INFINI:INFINI, m, c=0;
-    int* c_possibles = coups_possibles(s);
     for(int i=0; i<T_PLAT; i++){
         if(c_possibles[i]){
             Situation s2 = copie_situation(s);
             calcul_coup(&s2, i);
-            s2.joueur_tour = 1 - s2.joueur_tour;
             m = minmax_leger(s2, profondeur-1, joueur_a_maximiser, coup);
             int cond = joueur_a_maximiser==s.joueur_tour;
             //le joueur de notre noeud est-il celui que l'on veut avantager ?
