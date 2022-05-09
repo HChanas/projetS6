@@ -15,7 +15,7 @@ int scan_entree(Situation s){
             printf(" %d ", i);
         else
             printf("   ");
-    printf("\nTour du joueur %d : Choisis un trou\n", s.joueur_tour+1);
+    printf("\nTour du joueur %d : Choisissez un trou\n", s.joueur_tour+1);
     int entree=0; char buf[16];
     scanf("%s", buf); entree = atoi(buf);
     entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
@@ -57,7 +57,7 @@ int verif_fin(Situation s){
 
 /* Affiche le plateau et le score des joueurs. */
 void affiche_jeu(Situation s){
-    printf("points: Joueur 1 : %d, Joueur 2 : %d\n", s.pts_j1, s.pts_j2);
+    printf("Score : Joueur 1 : %d     Joueur 2 : %d\n", s.pts_j1, s.pts_j2);
     affiche_plateau(s.plateau);
 }
 
