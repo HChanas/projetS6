@@ -5,7 +5,7 @@
 #include "jeu.h"
 
 #define NB_FILS_MAX T_PLAT/2
-#define INFINI 50
+#define INFINI 100
 
 #define MIN(x, y) ((x)>(y)?(y):(x))
 #define MAX(x, y) ((x)<(y)?(y):(x))
