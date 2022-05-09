@@ -57,7 +57,7 @@ int verif_fin(Situation s){
 
 /* Affiche le plateau et le score des joueurs. */
 void affiche_jeu(Situation s){
-    printf("points: Joueur 1 : %d, Joueur 2 : %d\n", s.pts_j1, s.pts_j2);
+    printf("Score : Joueur 1 : %d     Joueur 2 : %d\n", s.pts_j1, s.pts_j2);
     affiche_plateau(s.plateau);
 }
 
