@@ -234,12 +234,11 @@ int verif_famine(Situation* s){
  * j1_capture et j2_capture indiquent si le joueur récupère les points ou non.
  * Les deux joueurs peuvent capturer les graines en même temps. */
 void grande_capture_finale(Situation* s, int j1_capture, int j2_capture){
-    for(int i=0; i<T_PLAT; i++)
-            if(s->plateau[i]){
-                if(j1_capture)
-                    s->pts_j1 += s->plateau[i];
-                if(j2_capture)
-                    s->pts_j2 += s->plateau[i];
-                s->plateau[i] = 0;
-            }
+    for(int i=0; i<T_PLAT; i++){
+        if(j1_capture)
+            s->pts_j1 += s->plateau[i];
+        if(j2_capture)
+            s->pts_j2 += s->plateau[i];
+        s->plateau[i] = 0;
+    }
 }
