@@ -5,7 +5,6 @@
 #include <math.h>
 #include <time.h>
 
-
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
 
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
@@ -55,6 +54,20 @@ int eval_nb_graines(Situation s, int joueur){
     int diff = joueur == 0 ? nb_graines_1 - nb_graines_2 : nb_graines_2 - nb_graines_1;
     diff /= 6; //la différence du nombre de graines a moins d'impact que les points
     return evaluation(s, joueur) + diff;
+}
+
+/* Compte le nombre de trous à zéro graines et améliore le résultat de eval_nb_grines. */
+int eval_nb_graines_zeros(Situation s, int joueur){
+    int nb_trous_1=0, nb_trous_2=0, moitie=T_PLAT/2;
+    for(int i=0; i<moitie; i++)
+        if(!s.plateau[i])
+            nb_trous_1++;
+    for(int i=moitie; i<T_PLAT; i++)
+        if(!s.plateau[i])
+            nb_trous_2++;
+    int diff = joueur==0 ? nb_trous_1-nb_trous_2 : nb_trous_2-nb_trous_1;
+    diff *= 2;
+    return eval_nb_graines(s, joueur) - diff;
 }
 
 /*--- GENERATION DE L'ARBRE ---*/

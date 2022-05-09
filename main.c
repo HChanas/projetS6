@@ -16,7 +16,7 @@ void jeu_solo(int profondeur){
         }
         else{
             printf("Calcul des coups...\n");
-            negamax_alphabeta(s,profondeur,1,&entree,-INFINI,INFINI,evaluation);
+            negamax_alphabeta(s,profondeur,1,&entree,-INFINI,INFINI,eval_nb_graines_zeros);
             //negamax_alphabeta(s, profondeur, 1, &entree, -INFINI, INFINI, evaluation);
             printf("Trou choisi : %d\n", entree+(2*(T_PLAT/2-entree)));
         }
@@ -36,7 +36,9 @@ int(*str_to_eval(char* str))(Situation,int){
         return evaluation;
     if(strcmp(str,"nb_graines")==0)
         return eval_nb_graines;
-    return evaluation;
+    if(strcmp(str, "zeros")==0)
+        return eval_nb_graines_zeros;
+    return eval_nb_graines_zeros;
 }
 
 int main(int argc, char** argv) {
@@ -61,11 +63,11 @@ int main(int argc, char** argv) {
         test_de_performances(atoi(argv[2]), atoi(argv[3]), str_to_e_algo(argv[4]), str_to_e_algo(argv[5]));
     }
     else if(strcmp(argv[1],"aff")==0){
-        if(argc!=7){
+        if(argc<7){
             printf("%s aff <nb parties> <prof j1> <prof j2> <fct d'eval 1> <fct d'eval 2>:\n"
                     "nb parties: nombre d'affrontements entre les deux IA\n"
                     "prof: profondeur d'arbre utilisée par l'IA\n"
-                    "fct d'eval: fonction d'évaluation utilisée par l'IA (defaut, nb_graines, ...)\n", argv[0]);
+                    "fct d'eval: fonction d'évaluation utilisée par l'IA (defaut, nb_graines, zeros)\n", argv[0]);
             return 1;
         }
         Donnees d = affrontements_successifs(atoi(argv[2]), (int[2]){atoi(argv[3]),atoi(argv[4])}, (int(*[2])(Situation,int)){str_to_eval(argv[5]), str_to_eval(argv[6])});

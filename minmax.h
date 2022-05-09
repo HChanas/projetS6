@@ -43,8 +43,11 @@ Situation copie_situation(Situation s);
  * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non. */
 int evaluation(Situation s, int joueur_a_maximiser);
 
-/* Prend un compte la différence de points et la différence du nombre de graines dans le camp des joueurs. */
+/* Prend en compte la différence de points et la différence du nombre de graines dans le camp des joueurs. */
 int eval_nb_graines(Situation s, int joueur_a_maximiser);
+
+/* Compte le nombre de trous à zéro graines et améliore le résultat de eval_nb_grines. */
+int eval_nb_graines_zeros(Situation s, int joueur_a_maximiser);
 
 /*--- GENERATION DE L'ARBRE ---*/
 
