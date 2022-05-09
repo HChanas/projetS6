@@ -5,3 +5,6 @@ run: awale
 
 awale: ${SRC} jeu.h
 	gcc -Wall -Werror -fsanitize=address -o $@ ${SRC} -lm
+
+clean:
+	rm -f awale
