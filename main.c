@@ -32,8 +32,11 @@ void jeu_solo(int profondeur){
 
 
 int(*str_to_eval(char* str))(Situation,int){
-    //if(strcmp(str,"eval")==0)
-    return evaluation; 
+    if(strcmp(str,"defaut")==0)
+        return evaluation;
+    if(strcmp(str,"nb_graines")==0)
+        return eval_nb_graines;
+    return evaluation;
 }
 
 int main(int argc, char** argv) {
@@ -62,11 +65,12 @@ int main(int argc, char** argv) {
             printf("%s aff <nb parties> <prof j1> <prof j2> <fct d'eval 1> <fct d'eval 2>:\n"
                     "nb parties: nombre d'affrontements entre les deux IA\n"
                     "prof: profondeur d'arbre utilisée par l'IA\n"
-                    "fct d'eval: fonction d'évaluation utilisée par l'IA (defaut,...)\n", argv[0]);
+                    "fct d'eval: fonction d'évaluation utilisée par l'IA (defaut, nb_graines, ...)\n", argv[0]);
             return 1;
         }
         Donnees d = affrontements_successifs(atoi(argv[2]), (int[2]){atoi(argv[3]),atoi(argv[4])}, (int(*[2])(Situation,int)){str_to_eval(argv[5]), str_to_eval(argv[6])});
-        printf("Taux de victoires :\nj1: %-7.4f, j2: %-7.4f\nPoints moyens :\nj1: %-7.4f, j2: %-7.4f\n", d.taux_v1, d.taux_v2, d.moy_pts_j1, d.moy_pts_j2);
+        printf("Taux de victoires :\nj1 (%5$s): %1$-7.4f\nj2 (%6$s): %2$-7.4f\nScore moyen :\nj1 (%5$s): %3$-7.4f\nj2 (%6$s): %4$-7.4f\n",
+        d.taux_v1, d.taux_v2, d.moy_pts_j1, d.moy_pts_j2, argv[5], argv[6]);
     }
     else{
         printf("%s <mode> [args]\nmodes :\n"

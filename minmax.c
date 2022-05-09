@@ -5,6 +5,7 @@
 #include <math.h>
 #include <time.h>
 
+
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
 
 /* Libère récursivement tout l'espace mémoire d'un arbre. */
@@ -42,6 +43,18 @@ Situation copie_situation(Situation s){
 /* Fonction d'évaluation. */
 int evaluation(Situation s, int joueur) {
   return joueur == 0 ? s.pts_j1 - s.pts_j2 : s.pts_j2 - s.pts_j1;
+}
+
+/* Prend un compte la différence de points et la différence du nombre de graines dans le camp des joueurs. */
+int eval_nb_graines(Situation s, int joueur){
+    int nb_graines_1=0, nb_graines_2=0, moitie=T_PLAT/2;
+    for(int i=0; i<moitie; i++)
+        nb_graines_1+=s.plateau[i];
+    for(int i=moitie; i<T_PLAT; i++)
+        nb_graines_2+=s.plateau[i];
+    int diff = joueur == 0 ? nb_graines_1 - nb_graines_2 : nb_graines_2 - nb_graines_1;
+    diff /= 6; //la différence du nombre de graines a moins d'impact que les points
+    return evaluation(s, joueur) + diff;
 }
 
 /*--- GENERATION DE L'ARBRE ---*/
@@ -298,6 +311,6 @@ void test_de_performances(int k, int profondeur, e_algo algo_1, e_algo algo_2){
     char buf[64], buf2[64]; 
     printf("Temps totaux :\njoueur 1 %3$-19s : %1$.3f s\njoueur 2 %4$-19s : %2$.3f s\n", EN_SEC((double)ticks[0]), EN_SEC((double)ticks[1]),
     e_algo_to_str(algos[0], buf, 64), e_algo_to_str(algos[1], buf2, 64));
-    printf("Taux de victoires :\nj1: %-7.4f, j2: %-7.4f\nPoints moyens :\nj1: %-7.4f, j2: %-7.4f\n",
+    printf("Taux de victoires :\nj1: %-7.4f\nj2: %-7.4f\nScore moyen :\nj1: %-7.4f\nj2: %-7.4f\n",
     (float)nb_v_j1 / k, (float)nb_v_j2 / k, (float)tt_pts_j1 / k,(float)tt_pts_j2 / k);
 }

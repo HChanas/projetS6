@@ -21,9 +21,7 @@ typedef struct noeud_t{
                // évaluée. Valeur donnée initialement aux feuilles par la
                // fonction d'évaluation.
     int feuille; // Indique si le noeud est une feuille pour simplifier des trucs
-    int coups;
     int numero_joueur;
-    int possible;
 } Noeud;
 
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
@@ -44,6 +42,9 @@ Situation copie_situation(Situation s);
 /* Fonction simple qui renvoie une valeur en fonction des points des joueurs.
  * Ce nombre doit permettre d'évaluer si une situation est à l'avantage du joueur ou non. */
 int evaluation(Situation s, int joueur_a_maximiser);
+
+/* Prend un compte la différence de points et la différence du nombre de graines dans le camp des joueurs. */
+int eval_nb_graines(Situation s, int joueur_a_maximiser);
 
 /*--- GENERATION DE L'ARBRE ---*/
 
