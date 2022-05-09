@@ -33,7 +33,7 @@ void jeu_solo(int profondeur){
 
 int(*str_to_eval(char* str))(Situation,int){
     //if(strcmp(str,"eval")==0)
-    return evaluation;
+    return evaluation; 
 }
 
 int main(int argc, char** argv) {
@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
             printf("%s aff <nb parties> <prof j1> <prof j2> <fct d'eval 1> <fct d'eval 2>:\n"
                     "nb parties: nombre d'affrontements entre les deux IA\n"
                     "prof: profondeur d'arbre utilisée par l'IA\n"
-                    "fct d'eval: fonction d'évaluation utilisée par l'IA (arbre, leger, alphabeta)\n", argv[0]);
+                    "fct d'eval: fonction d'évaluation utilisée par l'IA (defaut,...)\n", argv[0]);
             return 1;
         }
         Donnees d = affrontements_successifs(atoi(argv[2]), (int[2]){atoi(argv[3]),atoi(argv[4])}, (int(*[2])(Situation,int)){str_to_eval(argv[5]), str_to_eval(argv[6])});

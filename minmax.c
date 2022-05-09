@@ -22,7 +22,7 @@ void print_tree(Noeud *racine, int depth) {
         return;
     for (int i = 0; i < depth; i++)
         printf("\t");
-    printf("(%d) %d\n", racine->coups+1,racine->valeur);
+    printf("%d\n", racine->valeur);
     for (int i = 0; i < NB_FILS_MAX; i++)
         print_tree(racine->fils[i], depth + 1);
 }
@@ -54,7 +54,6 @@ Noeud* nouvel_arbre(Situation s, int joueur_a_max, int profondeur,int coup){
         racine->fils[i] = NULL;
     racine->feuille=0;
     racine->valeur=696969;
-    racine->coups=coup;
     racine->numero_joueur = s.joueur_tour;
     int* c_possibles = coups_possibles(s);
     if((profondeur==0)||(nb_cp(c_possibles, T_PLAT)==0)){
@@ -237,7 +236,7 @@ char* e_algo_to_str(e_algo a, char* buf, size_t size){
     switch (a){
         case arbre: strncpy(buf, "(minmax arbre)", size); break;
         case leger: strncpy(buf, "(minmax leger)", size); break;
-        case alphabeta: strncpy(buf, "(minmax alphabeta)", size);
+        case alphabeta: strncpy(buf, "(negamax alphabeta)", size);
     }
     return buf;
 }
@@ -255,7 +254,7 @@ e_algo str_to_e_algo(char* str){
  * mais mesure et affiche le temps total utilisé pour chaque IA à la fin.
  * algo_1 et algo_2 indiquent quelle fonction les IA utilisent. */
 void test_de_performances(int k, int profondeur, e_algo algo_1, e_algo algo_2){
-    int nb_coups_alea = (int)(log((double)k)/log(6.0)) + 1, coup;
+    int nb_coups_alea = (int)(log((double)k)/log(6.0)) + 1, res, coup, nb_v_j1 = 0, nb_v_j2 = 0, tt_pts_j1 = 0, tt_pts_j2 = 0;
     //                    calcul de log6(k)
     e_algo algos[2] = {algo_1, algo_2};
     clock_t ticks[2] = {0,0}, avant, apres;
@@ -284,11 +283,21 @@ void test_de_performances(int k, int profondeur, e_algo algo_1, e_algo algo_2){
             ticks[s.joueur_tour] += apres - avant;
             // calcul du prochain coup avec la fonction d'évaluation choisie pour ce joueur
             calcul_coup(&s, coup);
-            if(verif_fin(s))
-                break;
+            res = verif_fin(s);
+            if (res == 0)
+                continue;
+            tt_pts_j1 += s.pts_j1;
+            tt_pts_j2 += s.pts_j2;
+            if (res == 1)
+                nb_v_j1++;
+            else if (res == 2)
+                nb_v_j2++;
+            break;
         }
     }
     char buf[64], buf2[64]; 
-    printf("Temps totaux :\njoueur 1 %3$-18s : %1$.3f s\njoueur 2 %4$-18s : %2$.3f s\n", EN_SEC((double)ticks[0]), EN_SEC((double)ticks[1]),
+    printf("Temps totaux :\njoueur 1 %3$-19s : %1$.3f s\njoueur 2 %4$-19s : %2$.3f s\n", EN_SEC((double)ticks[0]), EN_SEC((double)ticks[1]),
     e_algo_to_str(algos[0], buf, 64), e_algo_to_str(algos[1], buf2, 64));
+    printf("Taux de victoires :\nj1: %-7.4f, j2: %-7.4f\nPoints moyens :\nj1: %-7.4f, j2: %-7.4f\n",
+    (float)nb_v_j1 / k, (float)nb_v_j2 / k, (float)tt_pts_j1 / k,(float)tt_pts_j2 / k);
 }
