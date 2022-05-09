@@ -15,7 +15,7 @@ int scan_entree(Situation s){
             printf(" %d ", i);
         else
             printf("   ");
-    printf("\nTour du joueur %d : Choisis un trou\n", s.joueur_tour+1);
+    printf("\nTour du joueur %d : Choisissez un trou\n", s.joueur_tour+1);
     int entree=0; char buf[16];
     scanf("%s", buf); entree = atoi(buf);
     entree += s.joueur_tour==1?(2*(T_PLAT/2-entree)):-1; //mathématiques pour convertir l'entree en id de case tu tableau
