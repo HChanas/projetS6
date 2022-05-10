@@ -13,7 +13,8 @@ typedef struct situation_t{ //enregistre l'état d'une partie
     int nb_coups;  //compte les coups joués pour y mettre une limite
 } Situation;
 
-
+/* Affiche les coups possibles dans le terminal. */
+void affiche_coups_possibles(int joueur, int* cp);
 /* récupère une entrée dans le terminal pour savoir quel coup le joueur veut jouer. */
 int scan_entree(Situation s);
 /* Lance une partie entre deux joueurs humains (local). */

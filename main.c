@@ -6,19 +6,19 @@
 
 /* Gère une partie d'awalé entre un joueur dans le terminal et une IA. 
  * L'IA est le joueur 2.*/
-void jeu_solo(int profondeur){
+void jeu_solo(int profondeur, int joueur_humain){
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s ={plateau, 0, 0, 0, 0};
     int entree, fn;
 
     while((fn=verif_fin(s))==0){ //tant que la partie n'est pas finie
-        affiche_jeu(s);
-        if(s.joueur_tour==0){ //j1
+        if(s.joueur_tour==joueur_humain){ //j1
             entree = scan_entree(s); //le coup joué est donné par le joueur dans le terminal
         }
         else{ //j2
+            affiche_jeu(s);
             printf("Calcul des coups...\n");
-            negamax_alphabeta(s,profondeur,1,&entree,-INFINI,INFINI,eval_nb_graines_zeros);
+            negamax_alphabeta(s,profondeur,s.joueur_tour,&entree,-INFINI,INFINI,eval_nb_graines_zeros);
             //le coup joué est donné par l'algo
             printf("Trou choisi : %d\n", entree+(2*(T_PLAT/2-entree)));
         }
@@ -48,14 +48,21 @@ int(*str_to_eval(char* str))(Situation,int){
 int main(int argc, char** argv) {
     if(argc<2){
         printf("%s <mode> [args]\nmodes :\n"
-                "pvc <profondeur>: match contre une IA avec une profondeur d'arbre donnée\n"
+                "pvc <profondeur> <joueur>: match contre une IA avec une profondeur d'arbre donnée\n"
                 "perf <nb parties> <profondeur> <fct minmax 1> <fct minmax 2>: test de performance entre deux IA\n"
                 "aff <nb parties> <prof j1> <prof j2> <fct d'eval 1> <fct d'eval 2>: k matchs entre deux IA\n",argv[0]);
         return 1;
     }
     srand(time(NULL));
-    if(strcmp(argv[1],"pvc")==0)
-        jeu_solo(atoi(argv[2]));
+    if(strcmp(argv[1],"pvc")==0){
+        if(argc!=4){
+            printf("%s pvc <profondeur> <joueur>:\n"
+                    "profondeur: profondeur d'arbre utilisée par l'IA\n"
+                    "joueur (0/1): 0 = joueur 1 (joue en premier), joueur 2 sinon\n", argv[0]);
+            return 1;
+        }
+        jeu_solo(atoi(argv[2]), atoi(argv[3]));
+    }
     else if(strcmp(argv[1],"perf")==0){
         if(argc!=6){
             printf("%s perf <nb parties> <profondeur> <fct minmax 1> <fct minmax 2>:\n"

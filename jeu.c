@@ -8,13 +8,20 @@
  * Cela permet de faciliter la répartition des tas en sens horaire. 
  */
 
-int scan_entree(Situation s){
-    int* cp = coups_possibles(s);
-    for(int i=1, j=s.joueur_tour==0?0:T_PLAT-1; i<T_PLAT+1; i++, j+=s.joueur_tour==0?1:-1)
+/* Affiche les coups possibles dans le terminal. */
+void affiche_coups_possibles(int joueur, int* cp){
+    for(int i=1, j=joueur==0?0:T_PLAT-1; i<T_PLAT+1; i++, j+=joueur==0?1:-1)
         if(cp[j])
             printf(" %d ", i);
         else
             printf("   ");
+}
+
+int scan_entree(Situation s){
+    int* cp = coups_possibles(s);
+    if(s.joueur_tour) affiche_jeu(s);
+    affiche_coups_possibles(s.joueur_tour, cp);
+    if(!s.joueur_tour) affiche_jeu(s);
     printf("\nTour du joueur %d : Choisissez un trou\n", s.joueur_tour+1);
     int entree=0; char buf[16];
     scanf("%s", buf); entree = atoi(buf);
@@ -33,7 +40,6 @@ void partie_pvp(){
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s = {plateau, 0, 0, 0};
     while(1){
-        affiche_jeu(s);
         int entree = scan_entree(s);
         calcul_coup(&s, entree);
         switch(verif_fin(s)){
