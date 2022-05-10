@@ -4,24 +4,27 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* Gère une partie d'awalé entre un joueur dans le terminal et une IA. 
+ * L'IA est le joueur 2.*/
 void jeu_solo(int profondeur){
     int plateau[T_PLAT] = {INIT_TAB};
     Situation s ={plateau, 0, 0, 0, 0};
     int entree, fn;
 
-    while((fn=verif_fin(s))==0){
+    while((fn=verif_fin(s))==0){ //tant que la partie n'est pas finie
         affiche_jeu(s);
-        if(s.joueur_tour==0){
-            entree = scan_entree(s);
+        if(s.joueur_tour==0){ //j1
+            entree = scan_entree(s); //le coup joué est donné par le joueur dans le terminal
         }
-        else{
+        else{ //j2
             printf("Calcul des coups...\n");
             negamax_alphabeta(s,profondeur,1,&entree,-INFINI,INFINI,eval_nb_graines_zeros);
-            //negamax_alphabeta(s, profondeur, 1, &entree, -INFINI, INFINI, evaluation);
+            //le coup joué est donné par l'algo
             printf("Trou choisi : %d\n", entree+(2*(T_PLAT/2-entree)));
         }
         calcul_coup(&s, entree);
     }
+    affiche_jeu(s);
     switch(verif_fin(s)){
         case 1: printf("Victoire joueur 1\n"); return;
         case 2: printf("Victoire joueur 2\n"); return;
@@ -30,7 +33,7 @@ void jeu_solo(int profondeur){
     }
 }
 
-
+/* Fonction qui renvoie un pointeur de fonction selon la chaine de cartactère donnée. */
 int(*str_to_eval(char* str))(Situation,int){
     if(strcmp(str,"defaut")==0)
         return evaluation;
@@ -41,6 +44,7 @@ int(*str_to_eval(char* str))(Situation,int){
     return eval_nb_graines_zeros;
 }
 
+/* Gestion des arguments. */
 int main(int argc, char** argv) {
     if(argc<2){
         printf("%s <mode> [args]\nmodes :\n"
