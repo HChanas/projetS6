@@ -54,10 +54,11 @@ void partie_pvp(){
 /* Vérifie si la partie est finie.
  * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné ; 3 -> égalité. */
 int verif_fin(Situation s){
-    if((s.pts_j1>=25)||(s.pts_j2>=25))
+    if((s.pts_j1>=25)||(s.pts_j2>=25)){
+        if(s.pts_j1==s.pts_j2)
+            return 3; //même nombre de points
         return (s.pts_j2>s.pts_j1)+1; //celui qui a le plus de points
-    if(s.pts_j1+s.pts_j2==48)
-        return 3; //24 à 24
+    }
     return 0;
 }
 
