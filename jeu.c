@@ -38,7 +38,7 @@ int scan_entree(Situation s){
 /* Lance une partie entre deux joueurs humains (local). */
 void partie_pvp(){
     int plateau[T_PLAT] = {INIT_TAB};
-    Situation s = {plateau, 0, 0, 0};
+    Situation s = {plateau, 0, 0, 0, 0};
     while(1){
         int entree = scan_entree(s);
         calcul_coup(&s, entree);
@@ -54,7 +54,7 @@ void partie_pvp(){
 /* Vérifie si la partie est finie.
  * 0 -> pas finie ; 1 -> joueur 1 a gagné ; 2 -> joueur 2 a gagné ; 3 -> égalité. */
 int verif_fin(Situation s){
-    if((s.pts_j1>=25)||(s.pts_j2>=25)){
+    if((s.pts_j1+s.pts_j2 >= 48)){
         if(s.pts_j1==s.pts_j2)
             return 3; //même nombre de points
         return (s.pts_j2>s.pts_j1)+1; //celui qui a le plus de points
@@ -162,6 +162,7 @@ void captures(Situation* s, int* trou){
         }
     }
     s->nb_coups++;
+    
     if(verif_famine(s))
         grande_capture_finale(s, s->joueur_tour==0, s->joueur_tour==1);
     if(s->nb_coups>NB_MAX_COUPS) //si la partie tourne en boucle (car le nb de coup est trop grand)
@@ -170,15 +171,14 @@ void captures(Situation* s, int* trou){
         grande_capture_finale(s, 1, 1);
 }
 
-/* Utilise les fonction du jeu pour calculer le plateau et les points des joueurs si le coup indiqué est joué.
- * Cette fonction ressemble donc à tour_de_jeu(), mais sans demander le coup dans le terminal. 
+/* Utilise les fonction du jeu pour calculer le plateau et les points des joueurs si le coup indiqué est joué. 
  * Il faut vérifier avant d'appeler cette fonction quels sont les coups possibles. */
 void calcul_coup(Situation *s, int coup) {
     // Répartition du tas en sens horaire
     repartition(*s, &coup);
     // Tas de billes mangés
     captures(s, &coup);
-    // Au tour du joueur suivant
+    // Au tour de l'autre joueur
     s->joueur_tour = 1 - s->joueur_tour;
 }
 

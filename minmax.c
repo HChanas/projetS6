@@ -223,11 +223,9 @@ void coups_aleatoires(Situation *s, int n) {
     }
 }
 
-/* Fonction qui lance k parties entre deux IA, utilisant les fonctions
- * d'évalutations ainsi que les profondeurs données. Les log6(k)+1 premiers coups
- * sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée. Le
- * troisième argument prend un tableau de pointeurs de fonctions de taille 2
- * (donc les deux fonctions d'évalutations)*/
+/* Fonction qui lance k parties entre deux IA, utilisant les fonctions d'évalutations ainsi que les profondeurs données.
+ * Les log6(k)+1 premiers coups sont joués aléatoirement, et la fonction minmax_alphabeta est utilisée.
+ * Le troisième argument prend un tableau de pointeurs de fonctions de taille 2 (donc les deux fonctions d'évalutation). */
 Donnees affrontements_successifs(int k, int profondeurs[2], int (**eval)(Situation,int)) {
     int nb_coups_alea = (int)(log((double)k)/log(6.0)) + 1, res, coup, nb_v_j1 = 0, nb_v_j2 = 0, tt_pts_j1 = 0, tt_pts_j2 = 0;
     //                    calcul de log6(k)
@@ -307,7 +305,6 @@ void test_de_performances(int k, int profondeur, e_algo algo_1, e_algo algo_2){
             }
             apres = clock();
             ticks[s.joueur_tour] += apres - avant;
-            // calcul du prochain coup avec la fonction d'évaluation choisie pour ce joueur
             calcul_coup(&s, coup);
             res = verif_fin(s);
             if (res == 0)

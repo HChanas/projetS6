@@ -14,14 +14,13 @@
 //permet de convertir un nombre de ticks de système en secondes
 
 typedef struct noeud_t{
-    struct noeud_t* fils[NB_FILS_MAX]; //Tableau de pointeurs vers les fils. Il peut y avoir des NULL, si certains coups étaient impossibles.
-    //A la i-ème case du tableau, se trouve l'adresse du noeud correspondant au coup i(+1). e.g. fils[1] -> trou 2 (ou 8 si joueur 2).
-    //Si par exemple le trou 4 (ou 10 donc) ne peut être joué, fils[3] = NULL.
-    int valeur;  // Si le noeud est une feille ou si la valeur de ses fils a été
-               // évaluée. Valeur donnée initialement aux feuilles par la
-               // fonction d'évaluation.
-    int feuille; // Indique si le noeud est une feuille pour simplifier des trucs
-    int numero_joueur;
+    struct noeud_t* fils[NB_FILS_MAX]; // Tableau de pointeurs vers les fils. Il peut y avoir des NULL, si certains coups étaient impossibles.
+    // A la i-ème case du tableau, se trouve l'adresse du noeud correspondant au coup i(+1). e.g. fils[1] -> trou 2 (ou 8 si joueur 2).
+    // Si par exemple le trou 4 (ou 10 donc) ne peut être joué, fils[3] = NULL.
+    int valeur;     // Si le noeud est une feuille ou si la valeur de ses fils a été évaluée.
+                    // Valeur donnée initialement aux feuilles par la fonction d'évaluation.
+    int feuille;    // Indique si le noeud est une feuille pour simplifier les choses.
+    int numero_joueur;  // Indique à quel joueur "appartient" le noeud.
 } Noeud;
 
 /*--- FONCTION DE GESTION DE L'ARBRE ---*/
